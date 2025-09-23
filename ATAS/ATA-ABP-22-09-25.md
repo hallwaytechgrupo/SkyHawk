@@ -1,0 +1,42 @@
+**Planejamento e definição de tarefas** 22/09/25
+
+**Participantes presentes:**  
+Vinícius Lemes  
+Mário César  
+Marcos Vinicius  
+Christopher
+
+**Link do repositório:** [SkyHawk/ATAS at main · hallwaytechgrupo/SkyHawk](https://github.com/hallwaytechgrupo/SkyHawk/tree/main/ATAS)
+
+**Matéria de Gestão Ágil** 
+
+**Continuação das questões de planejamento inicial do projeto.**
+
+Assuntos Discutidos:
+
+* User Stories: Definido em grupo as user stories para os requisitos, tanto funcionais como não funcionais e definições de projeto para facilitar o entendimento do grupo.   
+* Documento de Referência: Fio descrito e apresentado os user stories, anexados no formato MarckDown à pasta planejamento, depois de verificado e acordado com o grupo.  
+* Legendas e Círculos Vermelhos: Foi discutido a necessidade de rever alguns pontos do rascunho inicial do projeto no figma, assim detalhando um pouco melhor o esperado do protótipo para atividade específica de IHC.  
+* Próximos Passos: Foi acordado deixar a parte de IHC (Interação Humano-Computador) para o Vinicius ou para a próximas atividades, e concentrado a reunião e esforços do dia para finalizar as fases iniciais de planejamento, tentando entregar o backlog do projeto e backlog da sprint, para poder dar início definitivo nas tasks.  
+* ATA (Ata da Reunião): Foi revisto pelo grupo o modelo de entrega das ATAS DE REUNIÃO / ATAS DE ABP, facilitando o formato de entrega acadêmica e o registro das decisões e sequências de trabalho para o projeto, ainda assim de forma resumida para facilitar o acompanhamento dos professores.
+
+**Acordos:**
+
+* O planejamento conjunto será retomado no dia seguinte.  
+* As tabelas sugeridas para a ATA serão inseridas no Dontpad.
+
+**Atividades Realizadas na Presente Data:**
+
+* Reunião de planejamento do projeto.  
+* Criação de um documento inicial de referência no Dontpad com as atividades do projeto.  
+* Discussão e alinhamento sobre os próximos passos do projeto.
+
+**Tarefas que cada um do time está desempenhando até o devido momento** 
+
+|  | TASK | TASK |
+| :---- | ----- | ----- |
+| **Vinicius** | GAP-0001 \- CONFIG. TRELLO | GAP-0001 \- FIGMA TEMPLATE |
+| **Christofer** | GAP-0001 \- PESQUISAR TRATAMENTO DE DADOS | GAP-0001 \- CRIAÇÃO DO GITHUB |
+| **Marcos Vinicius** | GAP-0001 \- USER STORY | GAP-0001 \- FIGMA TEMPLATE |
+| **Mario Cesar** | GAP-0001 \- PESQUISAR TRATAMENTO DE DADOS | GAP-0001 \- LOGO DO PROJETO |
+
