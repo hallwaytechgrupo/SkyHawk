@@ -34,7 +34,7 @@ function App() {
           }}
         >
           <img
-            src="../public/skyhawklogo1.png"
+            src="/skyhawklogo.png"
             alt="Logo"
             style={{
               height: "48px",
@@ -42,7 +42,7 @@ function App() {
               border: "2px solid #007cbf",
               borderRadius: "8px",
               padding: "4px",
-              backgroundColor: "#1a1a1a",
+              backgroundColor: "transparent",
             }}
           />
           <div
@@ -66,7 +66,7 @@ function App() {
           </span>
         </div>
 
-        {/* Barra de Busca (lado direito) */}
+        {/* Campos de Coordenadas (lado direito) */}
         <div
           style={{
             display: "flex",
@@ -74,6 +74,7 @@ function App() {
             gap: "8px",
           }}
         >
+          {/* Campo Latitude */}
           <div
             style={{
               display: "flex",
@@ -82,51 +83,104 @@ function App() {
               border: "1px solid #444",
               borderRadius: "6px",
               padding: "0",
-              minWidth: "300px",
+              minWidth: "140px",
             }}
           >
+            <span
+              style={{
+                color: "#cccccc",
+                fontSize: "12px",
+                padding: "8px 8px 8px 12px",
+                fontWeight: "bold",
+              }}
+            >
+              LAT:
+            </span>
             <input
-              type="text"
-              placeholder="Buscar localização..."
+              type="number"
+              step="any"
+              placeholder="-23.5505"
               style={{
                 backgroundColor: "transparent",
                 border: "none",
                 color: "white",
-                padding: "8px 12px",
+                padding: "8px 8px 8px 4px",
                 fontSize: "14px",
                 outline: "none",
                 flex: 1,
+                width: "80px",
               }}
             />
-            <button
+          </div>
+
+          {/* Campo Longitude */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              backgroundColor: "#2a2a2a",
+              border: "1px solid #444",
+              borderRadius: "6px",
+              padding: "0",
+              minWidth: "140px",
+            }}
+          >
+            <span
               style={{
-                backgroundColor: "#007cbf",
-                border: "none",
-                color: "white",
-                padding: "8px 12px",
-                borderRadius: "0 5px 5px 0",
-                cursor: "pointer",
-                fontSize: "14px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                color: "#cccccc",
+                fontSize: "12px",
+                padding: "8px 8px 8px 12px",
+                fontWeight: "bold",
               }}
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
-            </button>
+              LNG:
+            </span>
+            <input
+              type="number"
+              step="any"
+              placeholder="-46.6333"
+              style={{
+                backgroundColor: "transparent",
+                border: "none",
+                color: "white",
+                padding: "8px 8px 8px 4px",
+                fontSize: "14px",
+                outline: "none",
+                flex: 1,
+                width: "80px",
+              }}
+            />
           </div>
+
+          {/* Botão Buscar */}
+          <button
+            style={{
+              backgroundColor: "#007cbf",
+              border: "none",
+              color: "white",
+              padding: "8px 12px",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </button>
         </div>
       </header>
 
