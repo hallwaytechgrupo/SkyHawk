@@ -217,3 +217,13 @@ O crescente volume de dados geoespaciais provenientes de satélites, embora um r
 | DW-0005 | Otimização de carregamento e responsividade | Interface final pronta | Sistema leve, rápido e responsivo em diferentes dispositivos |
 
 ---
+
+## 📈 Gráfico de Burndown
+
+Este é o gráfico de evolução das tarefas do projeto (burndown chart), mostrando o progresso ao longo dos sprints.
+
+<p align="center">
+  <img src="./assets/Burndown.JPG" alt="Burndown Chart" width="700"/>
+</p>
+
+---
