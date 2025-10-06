@@ -54,7 +54,7 @@ O projeto está organizado em três diretórios principais:
 ## 📷 Protótipo da Interface
 
 <p align="center">
-  <img src="./assets/MacBook Air - 1.png" alt="Protótipo SkyHawk" width="700"/>
+  <img src="./assets/Prototipo_-_ABP.png" alt="Protótipo SkyHawk" width="700"/>
 </p>
 
 -----------------------------------------------------
@@ -220,7 +220,7 @@ O crescente volume de dados geoespaciais provenientes de satélites, embora um r
 
 ## 📈 Gráfico de Burndown
 
-Este é o gráfico de evolução das tarefas do projeto (burndown chart), mostrando o progresso ao longo dos sprints.
+Este é o gráfico de evolução das tarefas do projeto (burndown chart), mostrando o progresso ao longo das sprints.
 
 <p align="center">
   <img src="./assets/Burndown.JPG" alt="Burndown Chart" width="700"/>
