@@ -21,7 +21,9 @@ export interface TimeSeriesRequest {
 	endDate?: string;
 }
 
-const API_BASE_URL = "http://localhost:5000/api";
+// Read API base URL from Vite environment variable. Set VITE_API_BASE_URL in your .env for production.
+// Falls back to localhost during development.
+const API_BASE_URL = (import.meta.env as any).VITE_API_BASE_URL ?? "http://localhost:5000/api";
 
 export const skyHawkService = {
 	async getTimeSeries(params: TimeSeriesRequest): Promise<TimeSeriesData> {
