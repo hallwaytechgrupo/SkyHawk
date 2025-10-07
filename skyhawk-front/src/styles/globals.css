@@ -1,0 +1,162 @@
+/* Scrollbar personalizada com paleta de cores da aplicação */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(42, 42, 42, 0.6) 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #007cbf 0%, #005a8b 100%);
+  border-radius: 8px;
+  border: 2px solid rgba(26, 26, 26, 0.3);
+  box-shadow: 0 2px 10px rgba(0, 124, 191, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #0099e6 0%, #0066a3 100%);
+  box-shadow: 0 4px 15px rgba(0, 124, 191, 0.5);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg, #005a8b 0%, #004066 100%);
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(26, 26, 26, 0.8);
+}
+
+/* Scrollbar para Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #007cbf rgba(26, 26, 26, 0.8);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Estilo para seleção de texto */
+::selection {
+  background: rgba(0, 124, 191, 0.3);
+  color: white;
+}
+
+::-moz-selection {
+  background: rgba(0, 124, 191, 0.3);
+  color: white;
+}
+
+/* Animações globais */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Classes utilitárias para animações */
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.slide-in-left {
+  animation: slideInFromLeft 0.5s ease-out;
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Melhorias para focus e acessibilidade */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid #007cbf;
+  outline-offset: 2px;
+}
+
+/* Transições suaves para elementos interativos */
+button,
+input,
+.interactive {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efeito hover sutil para cards */
+.glass-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 124, 191, 0.15);
+}
+
+/* Backdrop blur suporte para navegadores mais antigos */
+.backdrop-blur {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+@supports not (backdrop-filter: blur(20px)) {
+  .backdrop-blur {
+    background: rgba(26, 26, 26, 0.95) !important;
+  }
+}

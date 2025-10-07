@@ -1,46 +1,29 @@
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
+import Modal from "./Modal";
+import { skyHawkService, type TimeSeriesData } from "../services/skyHawkService";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYm9pdGF0YSIsImEiOiJjbTlrZGF3ejgwb2FxMnJvYWZ1Z3pudndpIn0.EiV7WmRDDZZBkY2A0PSJ1A";
 
-// Interface para a resposta da API
-interface TimeSeriesData {
-  success: boolean;
-  data: {
-    timeline: string[];
-    values: number[];
-    metadata: {
-      collection: string;
-      variable: string;
-      resolution: string;
-    };
-  };
-}
-
 // Função para chamar a API de séries temporais
-const fetchTimeSeries = async (lat: number, lng: number): Promise<void> => {
+const fetchTimeSeries = async (
+  lat: number, 
+  lng: number,
+  setModalData: (data: TimeSeriesData | null) => void,
+  setModalLoading: (loading: boolean) => void,
+  setModalError: (error: string | null) => void,
+  setModalCoordinates: (coords: { lat: number; lng: number } | null) => void,
+  setModalOpen: (open: boolean) => void
+): Promise<void> => {
   try {
-    const response = await fetch('http://localhost:5000/api/time-series', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        lat: lat,
-        lng: lng,
-        collection: "S2-16D-2",
-        variable: "NDVI",
-        startDate: "2024-01-01",
-        endDate: "2024-10-06"
-      }),
-    });
+    setModalLoading(true);
+    setModalError(null);
+    setModalData(null);
+    setModalCoordinates({ lat, lng });
+    setModalOpen(true);
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data: TimeSeriesData = await response.json();
+    const data = await skyHawkService.getTimeSeries({ lat, lng });
     
     console.log('=== DADOS DA SÉRIE TEMPORAL ===');
     console.log('Coordenadas:', { lat, lng });
@@ -50,17 +33,28 @@ const fetchTimeSeries = async (lat: number, lng: number): Promise<void> => {
     console.log('Dados completos:', data);
     console.log('================================');
     
+    setModalData(data);
+    
   } catch (error) {
     console.error('Erro ao buscar dados da série temporal:', error);
-    console.log('Verifique se o backend está rodando em http://localhost:5000');
+    setModalError(error instanceof Error ? error.message : 'Erro desconhecido. Verifique se o backend está rodando em http://localhost:5000');
+  } finally {
+    setModalLoading(false);
   }
 };
 
-const Map = () => {
+const MapComponent = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const [markers, setMarkers] = useState<mapboxgl.Marker[]>([]);
   const [selectionMode] = useState(false);
+
+  // Estados do Modal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState<TimeSeriesData | null>(null);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null);
+  const [modalCoordinates, setModalCoordinates] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -81,7 +75,15 @@ const Map = () => {
         console.log(`Ponto selecionado: ${lng}, ${lat}`);
 
         // Chamar a API para obter dados da série temporal
-        fetchTimeSeries(lat, lng);
+        fetchTimeSeries(
+          lat, 
+          lng, 
+          setModalData, 
+          setModalLoading, 
+          setModalError, 
+          setModalCoordinates, 
+          setModalOpen
+        );
 
         // Criar marcador padrão do Mapbox
         const marker = new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
@@ -171,8 +173,18 @@ const Map = () => {
       )}
 
       <div ref={mapContainer} style={{ width: "100%", height: "100%" }} />
+
+      {/* Modal para exibir dados da série temporal */}
+      <Modal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        data={modalData}
+        coordinates={modalCoordinates}
+        loading={modalLoading}
+        error={modalError}
+      />
     </div>
   );
 };
 
-export default Map;
+export default MapComponent;
