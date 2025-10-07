@@ -34,11 +34,13 @@ const modalStyles = {
     backdropFilter: 'blur(25px)',
     border: '1px solid rgba(255, 255, 255, 0.15)',
     borderRadius: '24px',
-    padding: '40px',
-    maxWidth: '950px',
-    width: '95%',
-    maxHeight: '92vh',
-    overflow: 'auto',
+  padding: '16px',
+  maxWidth: '900px',
+  width: '95%',
+  height: '90vh',
+  overflow: 'hidden',
+  display: 'flex',
+  flexDirection: 'column' as const,
     color: 'white',
     fontFamily: 'system-ui, Avenir, Helvetica, Arial, sans-serif',
     boxShadow: `
@@ -51,22 +53,22 @@ const modalStyles = {
   section: {
     background: 'linear-gradient(135deg, rgba(42, 42, 42, 0.7) 0%, rgba(26, 26, 26, 0.9) 100%)',
     backdropFilter: 'blur(15px)',
-    padding: '24px',
-    borderRadius: '20px',
+  padding: '12px',
+  borderRadius: '14px',
     border: '1px solid rgba(255, 255, 255, 0.12)',
     boxShadow: `
       0 12px 40px rgba(0, 0, 0, 0.4),
       inset 0 1px 0 rgba(255, 255, 255, 0.1)
     `,
-    marginBottom: '24px',
+    marginBottom: '12px',
     position: 'relative' as const,
     overflow: 'hidden',
   },
   kpiCard: {
     background: 'linear-gradient(135deg, rgba(42, 42, 42, 0.8) 0%, rgba(26, 26, 26, 0.9) 100%)',
     backdropFilter: 'blur(10px)',
-    padding: '20px',
-    borderRadius: '16px',
+  padding: '12px',
+  borderRadius: '12px',
     border: '1px solid rgba(255, 255, 255, 0.1)',
     textAlign: 'center' as const,
     position: 'relative' as const,
@@ -124,10 +126,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center', 
-          marginBottom: '32px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-          paddingBottom: '20px',
-          position: 'relative'
+          marginBottom: 0,
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          padding: '8px 0 8px 0',
+          position: 'relative',
+          flex: '0 0 auto'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{
@@ -143,44 +146,46 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
             </div>
             <div>
               <h2 style={{ 
-                margin: 0, 
-                fontSize: '28px', 
-                background: 'linear-gradient(135deg, #007cbf 0%, #00a8ff 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                fontWeight: 'bold',
-                letterSpacing: '-0.5px'
+                  margin: 0, 
+                  fontSize: '18px', 
+                  background: 'linear-gradient(135deg, #00a3d6 0%, #007cbf 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  fontWeight: 700,
+                  letterSpacing: '-0.3px'
               }}>
-                Análise Satelital
+                  Análise NDVI por Satélite
               </h2>
               <p style={{ 
-                margin: '4px 0 0 0', 
-                fontSize: '14px', 
-                color: 'rgba(255, 255, 255, 0.7)',
-                fontWeight: '500'
+                  margin: '4px 0 0 0', 
+                  fontSize: '12px', 
+                  color: 'rgba(255, 255, 255, 0.75)',
+                  fontWeight: 500
               }}>
-                Dados de Monitoramento por Satélite
+                Visualização temporal do índice NDVI na localização selecionada
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            style={{
-              background: 'rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              color: '#cccccc',
+              style={{
+              background: 'rgba(255, 255, 255, 0.08)',
+              backdropFilter: 'blur(6px)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              color: '#dddddd',
               cursor: 'pointer',
-              padding: '12px',
-              borderRadius: '12px',
+              padding: '8px',
+              borderRadius: '10px',
               display: 'flex',
               alignItems: 'center',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              transition: 'all 0.2s ease',
             }}
+            aria-label="Fechar modal - fechar análise"
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(220, 53, 69, 0.2)';
-              e.currentTarget.style.borderColor = 'rgba(220, 53, 69, 0.4)';
+              // manter hover azul para consistência com o design
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(0,163,214,0.12) 0%, rgba(0,124,191,0.12) 100%)';
+              e.currentTarget.style.borderColor = 'rgba(0,124,191,0.25)';
               e.currentTarget.style.transform = 'scale(1.05)';
             }}
             onMouseLeave={(e) => {
@@ -193,12 +198,14 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
           </button>
         </div>
 
+        {/* Conteúdo rolável (apenas esta área faz scroll) */}
+        <div style={{ flex: '1 1 auto', overflow: 'auto', paddingTop: '12px', paddingBottom: '12px' }}>
         {/* Loading refinado */}
         {loading && (
           <div style={{
             ...modalStyles.section,
             textAlign: 'center',
-            padding: '80px 40px',
+            padding: '28px 12px',
             background: 'linear-gradient(135deg, rgba(42, 42, 42, 0.8) 0%, rgba(26, 26, 26, 0.95) 100%)',
           }}>
             <div style={{ 
@@ -219,19 +226,19 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
                 <Loader2 size={48} color="white" className="spin" />
               </div>
               <div>
-                <div style={{ 
+                  <div style={{ 
                   color: 'white', 
-                  fontSize: '20px', 
+                  fontSize: '16px', 
                   fontWeight: '600', 
-                  marginBottom: '8px' 
+                  marginBottom: '6px' 
                 }}>
                   Processando Dados Satelitais
                 </div>
                 <div style={{ 
                   color: 'rgba(255, 255, 255, 0.7)', 
-                  fontSize: '14px',
-                  maxWidth: '300px',
-                  lineHeight: '1.5'
+                  fontSize: '12px',
+                  maxWidth: '360px',
+                  lineHeight: '1.4'
                 }}>
                   Conectando com os serviços do INPE e processando a série temporal NDVI...
                 </div>
@@ -244,9 +251,9 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
         {error && (
           <div style={{
             ...modalStyles.section,
-            background: 'linear-gradient(135deg, rgba(220, 53, 69, 0.15) 0%, rgba(26, 26, 26, 0.9) 100%)',
-            border: '1px solid rgba(220, 53, 69, 0.3)',
-            boxShadow: '0 8px 32px rgba(220, 53, 69, 0.2)',
+            background: 'linear-gradient(135deg, rgba(220, 53, 69, 0.12) 0%, rgba(26, 26, 26, 0.9) 100%)',
+            border: '1px solid rgba(220, 53, 69, 0.25)',
+            boxShadow: '0 6px 20px rgba(220, 53, 69, 0.16)',
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
               <div style={{
@@ -262,8 +269,8 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
               </div>
               <div style={{ flex: 1 }}>
                 <h3 style={{ 
-                  margin: '0 0 12px 0', 
-                  fontSize: '18px', 
+                  margin: '0 0 8px 0', 
+                  fontSize: '15px', 
                   color: '#ff6b6b',
                   fontWeight: '600'
                 }}>
@@ -277,11 +284,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
                   {error}
                 </div>
                 <div style={{ 
-                  marginTop: '12px',
-                  padding: '12px',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  borderRadius: '8px',
-                  fontSize: '13px',
+                  marginTop: '10px',
+                  padding: '8px',
+                  background: 'rgba(255, 255, 255, 0.04)',
+                  borderRadius: '6px',
+                  fontSize: '12px',
                   color: 'rgba(255, 255, 255, 0.7)'
                 }}>
                   <strong>Dica:</strong> Verifique se o backend está rodando em http://localhost:5000
@@ -297,18 +304,18 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
             {/* Coordenadas com design refinado */}
             {coordinates && (
               <div style={modalStyles.section}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
                   <div style={{
                     background: 'linear-gradient(135deg, #007cbf 0%, #005a8b 100%)',
-                    padding: '8px',
-                    borderRadius: '12px',
+                    padding: '6px',
+                    borderRadius: '10px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}>
                     <MapPin size={18} color="white" />
                   </div>
-                  <h3 style={{ margin: 0, fontSize: '18px', color: '#007cbf', fontWeight: '600' }}>
+                  <h3 style={{ margin: 0, fontSize: '15px', color: '#007cbf', fontWeight: '600' }}>
                     Localização Selecionada
                   </h3>
                 </div>
@@ -320,8 +327,8 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
                 }}>
                   <div style={{
                     background: 'linear-gradient(135deg, rgba(42, 42, 42, 0.8) 0%, rgba(26, 26, 26, 0.9) 100%)',
-                    padding: '16px 20px',
-                    borderRadius: '12px',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     flex: '1',
                     minWidth: '200px'
@@ -329,14 +336,14 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
                     <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '4px', fontWeight: '600', textTransform: 'uppercase' }}>
                       Latitude
                     </div>
-                    <div style={{ fontSize: '20px', fontFamily: 'monospace', color: '#007cbf', fontWeight: 'bold' }}>
+                    <div style={{ fontSize: '16px', fontFamily: 'monospace', color: '#007cbf', fontWeight: 'bold' }}>
                       {coordinates.lat.toFixed(6)}°
                     </div>
                   </div>
                   <div style={{
                     background: 'linear-gradient(135deg, rgba(42, 42, 42, 0.8) 0%, rgba(26, 26, 26, 0.9) 100%)',
-                    padding: '16px 20px',
-                    borderRadius: '12px',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
                     border: '1px solid rgba(255, 255, 255, 0.1)',
                     flex: '1',
                     minWidth: '200px'
@@ -344,7 +351,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
                     <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '4px', fontWeight: '600', textTransform: 'uppercase' }}>
                       Longitude
                     </div>
-                    <div style={{ fontSize: '20px', fontFamily: 'monospace', color: '#007cbf', fontWeight: 'bold' }}>
+                    <div style={{ fontSize: '16px', fontFamily: 'monospace', color: '#007cbf', fontWeight: 'bold' }}>
                       {coordinates.lng.toFixed(6)}°
                     </div>
                   </div>
@@ -355,10 +362,10 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
             {/* KPIs - Estatísticas minimalistas */}
             {stats && (
               <div style={modalStyles.section}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
                   <div style={{
                     background: 'rgba(42, 42, 42, 0.8)',
-                    padding: '8px',
+                    padding: '6px',
                     borderRadius: '8px',
                     display: 'flex',
                     alignItems: 'center',
@@ -366,61 +373,61 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
                   }}>
                     <BarChart3 size={20} color="#007cbf" />
                   </div>
-                  <h3 style={{ margin: 0, fontSize: '18px', color: 'white', fontWeight: '500' }}>
+                  <h3 style={{ margin: 0, fontSize: '15px', color: 'white', fontWeight: '500' }}>
                     Indicadores Principais
                   </h3>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
                   <div style={{
                     background: 'rgba(42, 42, 42, 0.6)',
-                    padding: '20px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(255, 255, 255, 0.06)',
                     textAlign: 'center' as const,
                   }}>
-                    <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '12px', fontWeight: '500', marginBottom: '8px', textTransform: 'uppercase' }}>
+                    <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '11px', fontWeight: '500', marginBottom: '6px', textTransform: 'uppercase' }}>
                       Valor Máximo
                     </div>
-                    <div style={{ color: 'white', fontSize: '28px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>
+                    <div style={{ color: 'white', fontSize: '20px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>
                       {stats.max.toFixed(4)}
                     </div>
-                    <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '11px', marginTop: '4px' }}>
+                    <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '10px', marginTop: '4px' }}>
                       NDVI Peak
                     </div>
                   </div>
                   
                   <div style={{
                     background: 'rgba(42, 42, 42, 0.6)',
-                    padding: '20px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(255, 255, 255, 0.06)',
                     textAlign: 'center' as const,
                   }}>
-                    <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '12px', fontWeight: '500', marginBottom: '8px', textTransform: 'uppercase' }}>
+                    <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '11px', fontWeight: '500', marginBottom: '6px', textTransform: 'uppercase' }}>
                       Valor Mínimo
                     </div>
-                    <div style={{ color: 'white', fontSize: '28px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>
+                    <div style={{ color: 'white', fontSize: '20px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>
                       {stats.min.toFixed(4)}
                     </div>
-                    <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '11px', marginTop: '4px' }}>
+                    <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '10px', marginTop: '4px' }}>
                       NDVI Low
                     </div>
                   </div>
                   
                   <div style={{
                     background: 'rgba(42, 42, 42, 0.6)',
-                    padding: '20px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(255, 255, 255, 0.06)',
                     textAlign: 'center' as const,
                   }}>
-                    <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '12px', fontWeight: '500', marginBottom: '8px', textTransform: 'uppercase' }}>
+                    <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '11px', fontWeight: '500', marginBottom: '6px', textTransform: 'uppercase' }}>
                       Valor Médio
                     </div>
-                    <div style={{ color: 'white', fontSize: '28px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>
+                    <div style={{ color: 'white', fontSize: '20px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>
                       {stats.avg.toFixed(4)}
                     </div>
-                    <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '11px', marginTop: '4px' }}>
+                    <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '10px', marginTop: '4px' }}>
                       NDVI Average
                     </div>
                   </div>
@@ -451,12 +458,12 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
                 </div>
               </div>
               <div style={{ 
-                height: '450px', 
+                height: '320px', 
                 width: '100%',
                 background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(42, 42, 42, 0.6) 100%)',
                 borderRadius: '16px',
-                padding: '20px',
-                border: '1px solid rgba(255, 255, 255, 0.08)'
+                padding: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.06)'
               }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
@@ -522,11 +529,14 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
           </>
         )}
 
-        {/* Footer refinado */}
+        </div>{/* fim do conteúdo rolável */}
+
+        {/* Footer refinado (fixo) */}
         <div style={{ 
-          marginTop: '40px', 
-          paddingTop: '24px', 
-          borderTop: '1px solid rgba(255, 255, 255, 0.12)', 
+          flex: '0 0 auto',
+          marginTop: '12px', 
+          paddingTop: '12px', 
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)', 
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
