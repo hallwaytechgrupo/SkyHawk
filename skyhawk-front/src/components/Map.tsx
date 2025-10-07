@@ -4,6 +4,58 @@ import mapboxgl from "mapbox-gl";
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYm9pdGF0YSIsImEiOiJjbTlrZGF3ejgwb2FxMnJvYWZ1Z3pudndpIn0.EiV7WmRDDZZBkY2A0PSJ1A";
 
+// Interface para a resposta da API
+interface TimeSeriesData {
+  success: boolean;
+  data: {
+    timeline: string[];
+    values: number[];
+    metadata: {
+      collection: string;
+      variable: string;
+      resolution: string;
+    };
+  };
+}
+
+// Função para chamar a API de séries temporais
+const fetchTimeSeries = async (lat: number, lng: number): Promise<void> => {
+  try {
+    const response = await fetch('http://localhost:5000/api/time-series', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        lat: lat,
+        lng: lng,
+        collection: "S2-16D-2",
+        variable: "NDVI",
+        startDate: "2024-01-01",
+        endDate: "2024-10-06"
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: TimeSeriesData = await response.json();
+    
+    console.log('=== DADOS DA SÉRIE TEMPORAL ===');
+    console.log('Coordenadas:', { lat, lng });
+    console.log('Sucesso:', data.success);
+    console.log('Metadados:', data.data.metadata);
+    console.log('Número de pontos na série:', data.data.timeline.length);
+    console.log('Dados completos:', data);
+    console.log('================================');
+    
+  } catch (error) {
+    console.error('Erro ao buscar dados da série temporal:', error);
+    console.log('Verifique se o backend está rodando em http://localhost:5000');
+  }
+};
+
 const Map = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -28,6 +80,9 @@ const Map = () => {
         const { lng, lat } = e.lngLat;
         console.log(`Ponto selecionado: ${lng}, ${lat}`);
 
+        // Chamar a API para obter dados da série temporal
+        fetchTimeSeries(lat, lng);
+
         // Criar marcador padrão do Mapbox
         const marker = new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
 
@@ -51,7 +106,9 @@ const Map = () => {
 
   // Função para limpar todos os marcadores
   const clearAllMarkers = () => {
-    markers.forEach((marker) => marker.remove());
+    for (const marker of markers) {
+      marker.remove();
+    }
     setMarkers([]);
     console.log("Todos os marcadores removidos");
   };
@@ -69,6 +126,7 @@ const Map = () => {
           }}
         >
           <button
+            type="button"
             onClick={clearAllMarkers}
             style={{
               padding: "8px 12px",
