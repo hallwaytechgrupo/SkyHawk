@@ -104,6 +104,43 @@ html {
   }
 }
 
+/* Design tokens: cores, espaçamentos, bordas, sombras e tipografia */
+:root {
+  /* Colors */
+  --brand-500: #007cbf;
+  --brand-400: #00a8ff;
+  --brand-600: #005a8b;
+  --bg-900: #1a1a1a;
+  --bg-800: #2a2a2a;
+  --surface-gradient: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(42, 42, 42, 0.85) 50%, rgba(26, 26, 26, 0.95) 100%);
+  --surface-gradient-2: linear-gradient(135deg, rgba(42, 42, 42, 0.7) 0%, rgba(26, 26, 26, 0.9) 100%);
+  --glass-gradient: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(42, 42, 42, 0.6) 100%);
+  --accent-gradient: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-400) 50%, var(--brand-600) 100%);
+  --border-muted: rgba(255, 255, 255, 0.12);
+  --muted: rgba(255, 255, 255, 0.7);
+  --muted-2: rgba(255, 255, 255, 0.6);
+
+  /* Spacing */
+  --space-xs: 6px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 20px;
+  --space-xl: 24px;
+
+  /* Radii */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+
+  /* Typography */
+  --font-base: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+
+  /* Shadows */
+  --shadow-1: 0 8px 25px rgba(0, 124, 191, 0.3);
+  --shadow-2: 0 32px 64px -12px rgba(0, 0, 0, 0.8);
+}
+
 /* Classes utilitárias para animações */
 .fade-in {
   animation: fadeIn 0.6s ease-out;
