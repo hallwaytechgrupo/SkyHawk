@@ -86,8 +86,8 @@ const MapComponent = () => {
           setModalOpen
         );
 
-        // Criar marcador customizado a partir do helper (SVG equilibrado)
-        const markerEl = createCustomMarker('#007cbf', 44);
+  // Criar marcador customizado a partir do helper (usa paleta padrão)
+  const markerEl = createCustomMarker();
         const marker = new mapboxgl.Marker({ element: markerEl as HTMLElement }).setLngLat([lng, lat]).addTo(map);
 
         // Adicionar evento de clique no marcador para removê-lo
