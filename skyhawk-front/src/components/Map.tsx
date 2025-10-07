@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import Modal from "./Modal";
 import { skyHawkService, type TimeSeriesData } from "../services/skyHawkService";
+import createCustomMarker from "./CustomMarker";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYm9pdGF0YSIsImEiOiJjbTlrZGF3ejgwb2FxMnJvYWZ1Z3pudndpIn0.EiV7WmRDDZZBkY2A0PSJ1A";
@@ -85,12 +86,12 @@ const MapComponent = () => {
           setModalOpen
         );
 
-        // Criar marcador padrão do Mapbox
-        const marker = new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
+        // Criar marcador customizado a partir do helper (SVG equilibrado)
+        const markerEl = createCustomMarker('#007cbf', 44);
+        const marker = new mapboxgl.Marker({ element: markerEl as HTMLElement }).setLngLat([lng, lat]).addTo(map);
 
         // Adicionar evento de clique no marcador para removê-lo
         const markerElement = marker.getElement();
-        markerElement.style.cursor = "pointer";
         markerElement.title = "Clique para remover este marcador";
 
         markerElement.addEventListener("click", (event) => {
