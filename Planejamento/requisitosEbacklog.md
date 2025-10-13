@@ -110,8 +110,9 @@
 | TC-0004    | Implementação de filtros por satélite, variável e período             | Interface e dados prontos                                                           | Filtros aplicáveis e funcionais na interface                                       |
 | BDN-0002   | Armazenamento de séries temporais e variáveis geoespaciais            | Estrutura de dados definida                                                         | Dados armazenados corretamente e acessíveis via API                                |
 | BDN-0003   | Implementação de filtros e consultas eficientes                       | Dados armazenados e filtros definidos                                               | Consultas otimizadas e testadas com diferentes parâmetros                          |
-| DW-0003    | Visualização lado a lado de séries temporais em gráficos              | Dados comparáveis disponíveis                                                       | Gráficos exibindo corretamente as séries selecionadas                              |
-| DW-0004    | Implementação de filtros e painel de controle                         | Filtros definidos e interface preparada                                             | Painel funcional com filtros aplicáveis e responsivos                              |
+| DW-0003    | Reposicionamento de componentes do front, de acordo com avaliação do cliente              | Dados comparáveis disponíveis                                                       | Gráficos exibindo corretamente as séries selecionadas                              |
+| DW-0004    | Visualização lado a lado de séries temporais em gráficos              | Dados comparáveis disponíveis                                                       | Gráficos exibindo corretamente as séries selecionadas                              |
+| DW-0005    | Implementação de filtros e painel de controle                         | Filtros definidos e interface preparada                                             | Painel funcional com filtros aplicáveis e responsivos                              |
 
 ---
 
@@ -126,6 +127,6 @@
 | TC-0005    | Exportação de dados e metadados em formatos compatíveis               | Dados disponíveis e estrutura de exportação definida                                | Exportação funcional em formatos como CSV ou JSON                                  |
 | BDN-0004   | Estratégia de cache para otimizar performance                         | Dados acessados com frequência identificados                                        | Cache implementado e validado com melhoria de tempo de resposta                    |
 | BDN-0005   | Garantia de integridade e atualização dos dados                       | Estrutura de dados e fontes definidas                                               | Validação automática de dados e atualização periódica implementada                 |
-| DW-0005    | Otimização de carregamento e responsividade                           | Interface final pronta                                                              | Sistema leve, rápido e responsivo em diferentes dispositivos                       |
+| DW-0006    | Otimização de carregamento e responsividade                           | Interface final pronta                                                              | Sistema leve, rápido e responsivo em diferentes dispositivos                       |
 
 ---
