@@ -12,56 +12,33 @@
 
  ```
    {
-     "date": "2025-02-18T00:00:00z", //exemplo de data
-    "data":{
-        "geom":{
-            "coordinates":[
-                -52.63215,
-                -28.31698
-            ]
-            "type": "Point"
+
+  "date": ISODate("2025-02-18T00:00:00Z"), // Corrigido para formato ISODate
+  "data": {
+    "geom": {
+      "type": "Point", // Corrigido: "type" deve vir antes ou separado corretamente
+      "coordinates": [-52.63215, -28.31698]
+    },
+    "start_datetime": "2020-01-01T00:00:00Z", // Corrigido: letra "t" minúscula trocada por "T"
+    "end_datetime": "2020-06-01T00:00:00Z",   // Corrigido: letra "T" maiúscula no lugar certo
+    "results": {
+      "timeline": [
+        "2018-01-01T00:00:00Z",
+        "2018-01-17T00:00:00Z",
+        "2018-02-02T00:00:00Z",
+        "2018-02-18T00:00:00Z"
+      ],
+      "values": {
+        "EVI": {
+          "mean": [0.365, 0.425, 0.468, 0.563],
+          "std": [0.394, 0.563, 0.572, 0.63]
         },
-        "start_datetime":"2020-01-01:t00:00:00Z",
-        "end_datetime":"2020-06-01-T00:00:00Z",
-        "results":{
-            "timeline": [
-                "2018-01-01T00:00:00Z",
-                "2018-01-17T00:00:00Z",
-                "2018-02-02T00:00:00Z",
-                "2018-02-18T00:00:00Z"
-                ],
-            "values": {
-                "EVI": {
-                    "mean": [
-                        0.365,
-                        0.425,
-                        0.468,
-                        0.563
-                        ],
-                        "std": [
-                            0.394,
-                            0.563,
-                            0.572,
-                            0.63
-                            ]
-                    },
-                    "NDVI": {
-                        "mean": [
-                            0.365,
-                            0.425,
-                            0.468,
-                            0.563
-                            ],
-                       "std": [
-                            0.394,
-                            0.563,
-                            0.572,
-                            0.63
-                            ]
-                           }
-                        }
-                   }
+        "NDVI": {
+          "mean": [0.365, 0.425, 0.468, 0.563],
+          "std": [0.394, 0.563, 0.572, 0.63]
         }
+      }
+    }
    }
    ``` 
    assim para efeitos de desenvolvimento e manutenção os documentos a serem inseridos no banco, trazem a data da pesquisa e os dados retornados para a pesquisa, ainda em analize se os dados serão salvos a cada pesquisa e a forma como os dados serão enviados para o banco, de forma a não prejudicar a usabilidade do sistema principal, que visa centralizar as informações
