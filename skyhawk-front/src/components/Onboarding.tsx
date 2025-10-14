@@ -66,7 +66,7 @@ const Onboarding: React.FC = () => {
 
   const close = () => {
     if (dontShow) {
-      try { localStorage.setItem('skyhawk:onboardingSeen', 'true'); } catch (e) {}
+      try { localStorage.setItem('skyhawk:onboardingSeen', 'true'); } catch (e) { }
     }
     setVisible(false);
   };
