@@ -35,9 +35,9 @@ const modalStyles = {
     border: '1px solid var(--border-muted)',
     borderRadius: 'var(--radius-lg)',
     padding: 'var(--space-md)',
-  maxWidth: '900px',
-  width: '95%',
-  height: '90vh',
+  maxWidth: '1100px',
+  width: '98%',
+  height: '95vh',
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column' as const,
@@ -108,6 +108,12 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
     value: data.data.values[index] || 0,
     fullDate: date
   })) || [];
+
+  // Versão escalada dos dados para visualização vertical ampliada (4x)
+  const chartDataScaled = chartData.map(d => ({ ...d, value: (typeof d.value === 'number' ? d.value * 4 : d.value) }));
+
+  // Rótulo do tipo de dado (ex: 'NDVI', 'EVI') vindo dos metadados
+  const variableLabel = (data && data.data && data.data.metadata && data.data.metadata.variable) ? data.data.metadata.variable : 'NDVI';
 
   // Calcular estatísticas
   const validValues = data?.data.values.filter(v => v !== null && !Number.isNaN(v)) || [];
@@ -359,171 +365,193 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, data, coordinates, loadi
               </div>
             )}
 
-            {/* KPIs - Estatísticas minimalistas */}
-            {stats && (
-              <div style={modalStyles.section}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-                  <div style={{
-                    background: 'rgba(42, 42, 42, 0.8)',
-                    padding: '6px',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                    <BarChart3 size={20} color="#007cbf" />
-                  </div>
-                  <h3 style={{ margin: 0, fontSize: '15px', color: 'white', fontWeight: '500' }}>
-                    Indicadores Principais
-                  </h3>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
-                  <div style={{
-                    background: 'rgba(42, 42, 42, 0.6)',
-                    padding: '12px',
-                    borderRadius: '10px',
-                    border: '1px solid rgba(255, 255, 255, 0.06)',
-                    textAlign: 'center' as const,
-                  }}>
-                    <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '11px', fontWeight: '500', marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Valor Máximo
-                    </div>
-                    <div style={{ color: 'white', fontSize: '20px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>
-                      {stats.max.toFixed(4)}
-                    </div>
-                    <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '10px', marginTop: '4px' }}>
-                      NDVI Peak
-                    </div>
-                  </div>
-                  
-                  <div style={{
-                    background: 'rgba(42, 42, 42, 0.6)',
-                    padding: '12px',
-                    borderRadius: '10px',
-                    border: '1px solid rgba(255, 255, 255, 0.06)',
-                    textAlign: 'center' as const,
-                  }}>
-                    <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '11px', fontWeight: '500', marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Valor Mínimo
-                    </div>
-                    <div style={{ color: 'white', fontSize: '20px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>
-                      {stats.min.toFixed(4)}
-                    </div>
-                    <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '10px', marginTop: '4px' }}>
-                      NDVI Low
-                    </div>
-                  </div>
-                  
-                  <div style={{
-                    background: 'rgba(42, 42, 42, 0.6)',
-                    padding: '12px',
-                    borderRadius: '10px',
-                    border: '1px solid rgba(255, 255, 255, 0.06)',
-                    textAlign: 'center' as const,
-                  }}>
-                    <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '11px', fontWeight: '500', marginBottom: '6px', textTransform: 'uppercase' }}>
-                      Valor Médio
-                    </div>
-                    <div style={{ color: 'white', fontSize: '20px', fontWeight: '600', fontFamily: 'monospace', lineHeight: '1' }}>
-                      {stats.avg.toFixed(4)}
-                    </div>
-                    <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '10px', marginTop: '4px' }}>
-                      NDVI Average
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Gráfico refinado */}
-            <div style={modalStyles.section}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+            {/* KPIs e Gráfico lado-a-lado (indicadores à esquerda, gráfico à direita) */}
+            <div style={{
+              display: 'flex',
+              gap: '20px',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
+              width: '100%',
+              boxSizing: 'border-box',
+              paddingTop: '8px'
+            }}>
+              {/* Coluna esquerda - Indicadores (largura controlada) */}
+              {stats && (
                 <div style={{
-                  background: 'linear-gradient(135deg, #007cbf 0%, #005a8b 100%)',
-                  padding: '8px',
-                  borderRadius: '12px',
+                  width: '320px',
+                  minWidth: '260px',
+                  maxWidth: '340px',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  flexDirection: 'column',
+                  gap: '12px',
+                  alignSelf: 'flex-start'
                 }}>
-                  <TrendingUp size={20} color="white" />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{
+                      background: 'rgba(42, 42, 42, 0.8)',
+                      padding: '8px',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 8px 25px rgba(0, 124, 191, 0.2)'
+                    }}>
+                      <BarChart3 size={20} color="#007cbf" />
+                    </div>
+                    <h3 style={{ margin: 0, fontSize: '15px', color: 'white', fontWeight: '600' }}>
+                      Indicadores Principais
+                    </h3>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
+                    <div style={{
+                      ...modalStyles.kpiCard as any,
+                      textAlign: 'left' as const,
+                      padding: '12px'
+                    }}>
+                      <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px', fontWeight: 500, textTransform: 'uppercase' }}>
+                        Valor Máximo
+                      </div>
+                      <div style={{ color: 'white', fontSize: '20px', fontWeight: 600, fontFamily: 'monospace', lineHeight: 1 }}>
+                        {stats.max.toFixed(4)}
+                      </div>
+                      <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '10px', marginTop: '4px' }}>
+                        NDVI Peak
+                      </div>
+                    </div>
+
+                    <div style={{
+                      ...modalStyles.kpiCard as any,
+                      textAlign: 'left' as const,
+                      padding: '12px'
+                    }}>
+                      <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px', fontWeight: 500, textTransform: 'uppercase' }}>
+                        Valor Mínimo
+                      </div>
+                      <div style={{ color: 'white', fontSize: '20px', fontWeight: 600, fontFamily: 'monospace', lineHeight: 1 }}>
+                        {stats.min.toFixed(4)}
+                      </div>
+                      <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '10px', marginTop: '4px' }}>
+                        NDVI Low
+                      </div>
+                    </div>
+
+                    <div style={{
+                      ...modalStyles.kpiCard as any,
+                      textAlign: 'left' as const,
+                      padding: '12px'
+                    }}>
+                      <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px', fontWeight: 500, textTransform: 'uppercase' }}>
+                        Valor Médio
+                      </div>
+                      <div style={{ color: 'white', fontSize: '20px', fontWeight: 600, fontFamily: 'monospace', lineHeight: 1 }}>
+                        {stats.avg.toFixed(4)}
+                      </div>
+                      <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '10px', marginTop: '4px' }}>
+                        NDVI Average
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '20px', color: '#007cbf', fontWeight: '600' }}>
-                    Série Temporal - {data.data.metadata.variable}
-                  </h3>
-                  <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: 'rgba(255, 255, 255, 0.7)' }}>
-                    Satélite: {data.data.metadata.collection} • Resolução: {data.data.metadata.resolution}
-                  </p>
-                </div>
-              </div>
-              <div style={{ 
-                height: '320px', 
-                width: '100%',
-                background: 'linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(42, 42, 42, 0.6) 100%)',
-                borderRadius: '16px',
-                padding: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.06)'
+              )}
+
+              {/* Coluna direita - Área de 4 gráficos empilhados verticalmente (ampliada) */}
+              <div style={{
+                flex: 1,
+                minWidth: '480px',
+                height: '680px', /* aumentado para comportar gráficos maiores */
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px'
               }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                    <CartesianGrid 
-                      strokeDasharray="2 4" 
-                      stroke="rgba(255, 255, 255, 0.08)" 
-                      horizontal={true}
-                      vertical={false}
-                    />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="rgba(255, 255, 255, 0.6)" 
-                      fontSize={12}
-                      tick={{ fill: 'rgba(255, 255, 255, 0.6)' }}
-                      axisLine={{ stroke: 'rgba(255, 255, 255, 0.2)' }}
-                      tickLine={{ stroke: 'rgba(255, 255, 255, 0.2)' }}
-                    />
-                    <YAxis 
-                      stroke="rgba(255, 255, 255, 0.6)" 
-                      fontSize={12}
-                      tick={{ fill: 'rgba(255, 255, 255, 0.6)' }}
-                      axisLine={{ stroke: 'rgba(255, 255, 255, 0.2)' }}
-                      tickLine={{ stroke: 'rgba(255, 255, 255, 0.2)' }}
-                      domain={['dataMin - 0.02', 'dataMax + 0.02']}
-                    />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: 'rgba(26, 26, 26, 0.98)',
-                        border: '1px solid rgba(0, 124, 191, 0.3)',
-                        borderRadius: '12px',
-                        backdropFilter: 'blur(20px)',
-                        color: 'white',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
-                        fontSize: '13px'
-                      }}
-                      labelStyle={{ color: '#007cbf', fontWeight: 'bold' }}
-                      itemStyle={{ color: 'white' }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="value" 
-                      stroke="url(#gradient)" 
-                      strokeWidth={4}
-                      dot={{ fill: '#007cbf', strokeWidth: 3, r: 5, stroke: 'white' }}
-                      activeDot={{ 
-                        r: 8, 
-                        stroke: '#007cbf', 
-                        strokeWidth: 3, 
-                        fill: 'white'
-                      }}
-                    />
-                    <defs>
-                      <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#007cbf" />
-                        <stop offset="50%" stopColor="#00a8ff" />
-                        <stop offset="100%" stopColor="#007cbf" />
-                      </linearGradient>
-                    </defs>
-                  </LineChart>
-                </ResponsiveContainer>
+                <div style={{
+                  flex: '1 1 auto',
+                  background: 'linear-gradient(135deg, rgba(26,26,26,0.8) 0%, rgba(42,42,42,0.6) 100%)',
+                  borderRadius: '16px',
+                  padding: '10px',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  boxShadow: '0 8px 40px rgba(0,0,0,0.6)',
+                  display: 'grid',
+                  gridTemplateColumns: '1fr',
+                  gridTemplateRows: 'repeat(4, 1fr)',
+                  gap: '10px',
+                  overflow: 'hidden'
+                }}>
+                  {/* Renderizar 4 gráficos empilhados (visualização vertical escalada) */}
+                  {[0,1,2,3].map((i) => (
+                    <div key={i} style={{ width: '100%', height: '100%', borderRadius: '8px', overflow: 'hidden', background: 'rgba(0,0,0,0.04)' }}>
+                      <div style={{ display: 'flex', alignItems: 'stretch', height: '100%' }}>
+                        {/* Título à esquerda do gráfico */}
+                        <div style={{ width: '120px', minWidth: '90px', padding: '8px 10px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: '#00a3d6' }}>{variableLabel}</div>
+                        </div>
+                        {/* Área do gráfico */}
+                        <div style={{ flex: 1, height: '100%' }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            {/* Usamos chartDataScaled para ampliação vertical (apenas visual) */}
+                            <LineChart data={chartDataScaled} margin={{ top: 6, right: 6, left: 6, bottom: 6 }}>
+                              <defs>
+                                <linearGradient id={`gradient-${i}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                                  <stop offset="0%" stopColor="#007cbf" />
+                                  <stop offset="50%" stopColor="#00a8ff" />
+                                  <stop offset="100%" stopColor="#007cbf" />
+                                </linearGradient>
+                              </defs>
+                              <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                              <XAxis dataKey="date" stroke="rgba(255,255,255,0.6)" tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 10 }} interval={0} angle={-45} textAnchor="end" height={48} />
+                              <YAxis stroke="rgba(255,255,255,0.6)" tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 10 }} tickCount={8} domain={["dataMin - 0.02", "dataMax + 0.02"]} />
+                              <Tooltip contentStyle={{ background: 'rgba(26,26,26,0.95)', border: '1px solid rgba(255,255,255,0.06)', fontSize: 12 }} />
+                              <Line type="monotone" dataKey="value" stroke={`url(#gradient-${i})`} strokeWidth={2.5} dot={{ r: 2 }} />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Tabela de dados alinhada exatamente abaixo dos gráficos */}
+                <div style={{
+                  width: '100%',
+                  overflowX: 'auto',
+                  background: 'transparent'
+                }}>
+                  <div style={{
+                    minWidth: '100%',
+                    borderRadius: '8px',
+                    overflow: 'auto'
+                  }}>
+                    <table style={{
+                      width: '100%',
+                      borderCollapse: 'collapse',
+                      color: 'white',
+                      fontSize: 13
+                    }}>
+                      <thead>
+                        <tr>
+                          <th style={{ textAlign: 'left', padding: '8px 10px', color: 'rgba(255,255,255,0.85)' }}>Satélite</th>
+                          {chartData.map((d, idx) => (
+                            <th key={idx} style={{ padding: '8px 10px', color: 'rgba(255,255,255,0.75)', textAlign: 'center' }}>{d.date}</th>
+                          ))}
+                        </tr>
+                        <tr>
+                          <th style={{ padding: '4px 10px', background: 'transparent' }}></th>
+                          {chartData.map((_, idx) => (
+                            <th key={idx} style={{ padding: '4px 10px', color: 'rgba(255,255,255,0.6)', textAlign: 'center', fontSize: 12 }}>NDVI</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td style={{ padding: '8px 10px', fontWeight: 600, color: '#00a3d6' }}>{data?.data?.metadata?.collection || 'Satélite'}</td>
+                          {chartData.map((d, idx) => (
+                            <td key={idx} style={{ padding: '8px 10px', textAlign: 'center', color: 'white' }}>{typeof d.value === 'number' ? d.value.toFixed(4) : '—'}</td>
+                          ))}
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
             </div>
           </>

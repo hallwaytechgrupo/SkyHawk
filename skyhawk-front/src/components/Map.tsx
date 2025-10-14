@@ -47,7 +47,8 @@ const fetchTimeSeries = async (
 const MapComponent = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const [markers, setMarkers] = useState<mapboxgl.Marker[]>([]);
+  // Ref para manter os marcadores atuais e evitar problemas de closure no handler
+  const markersRef = useRef<mapboxgl.Marker[]>([]);
   const [selectionMode] = useState(false);
 
   // Estados do Modal
@@ -86,28 +87,34 @@ const MapComponent = () => {
           setModalOpen
         );
 
-  // Criar marcador customizado a partir do helper (usa paleta padrão)
-  const markerEl = createCustomMarker();
+        // Antes de criar um novo marcador, remover todos os marcadores anteriores
+        // Usamos markersRef para evitar problemas com closures e garantir remoção
+        if (markersRef.current && markersRef.current.length > 0) {
+          for (const m of markersRef.current) {
+            try { m.remove(); } catch (err) { /* ignore */ }
+          }
+          markersRef.current = [];
+          //setMarkers([]);
+        }
+
+        // Criar marcador customizado a partir do helper (usa paleta padrão)
+        const markerEl = createCustomMarker();
         const marker = new mapboxgl.Marker({ element: markerEl as HTMLElement }).setLngLat([lng, lat]).addTo(map);
 
-        // Adicionar evento de clique no marcador para removê-lo
-        const markerElement = marker.getElement();
-        markerElement.title = "Clique para remover este marcador";
+        // NOTA: mantemos sem listener de remoção no marcador individual; remoção
+        // ocorrerá no próximo clique no mapa
 
-        markerElement.addEventListener("click", (event) => {
-          event.stopPropagation(); // Evita propagar o clique para o mapa
-          marker.remove();
-          setMarkers((prevMarkers) => prevMarkers.filter((m) => m !== marker));
-          console.log("Marcador removido");
-        });
-
-        // Armazenar o marcador no estado
-        setMarkers((prevMarkers) => [...prevMarkers, marker]);
+        // Atualizar ref e estado
+        markersRef.current = [marker];
+        //setMarkers([marker]);
       }
     });
   }, [selectionMode]);
 
-  // Função para limpar todos os marcadores
+  // Função para limpar todos os marcadores (comentada porque o botão
+  // 'Limpar Marcadores' foi removido temporariamente. Mantida para
+  // implementação futura conforme planejamento do projeto.)
+  /*
   const clearAllMarkers = () => {
     for (const marker of markers) {
       marker.remove();
@@ -115,10 +122,15 @@ const MapComponent = () => {
     setMarkers([]);
     console.log("Todos os marcadores removidos");
   };
+  */
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
       {/* Controles */}
+      {/*
+        'Limpar Marcadores' foi comentadoo para implementação
+        futura de acordo com o planejamento do projeto.
+
       {markers.length > 0 && (
         <div
           style={{
@@ -145,8 +157,11 @@ const MapComponent = () => {
           </button>
         </div>
       )}
+      */}
 
-      {/* Informações dos marcadores */}
+      {/*
+        Informações dos marcadores (comentadas para futura reativação).
+
       {markers.length > 0 && (
         <div
           style={{
@@ -172,6 +187,7 @@ const MapComponent = () => {
           </div>
         </div>
       )}
+      */}
 
       <div ref={mapContainer} style={{ width: "100%", height: "100%" }} />
 
