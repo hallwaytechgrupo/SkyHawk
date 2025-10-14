@@ -1,5 +1,6 @@
 import "./App.css";
 import Map from "./components/Map";
+import Onboarding from "./components/Onboarding";
 
 function App() {
   return (
@@ -195,6 +196,7 @@ function App() {
       >
         <Map />
       </div>
+      <Onboarding />
     </div>
   );
 }
