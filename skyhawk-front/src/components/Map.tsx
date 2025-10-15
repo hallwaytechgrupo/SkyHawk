@@ -1,47 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import Modal from "./Modal";
-import { skyHawkService, type TimeSeriesData } from "../services/skyHawkService";
+import {
+  skyHawkService,
+  type TimeSeriesData,
+} from "../services/skyHawkService";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYm9pdGF0YSIsImEiOiJjbTlrZGF3ejgwb2FxMnJvYWZ1Z3pudndpIn0.EiV7WmRDDZZBkY2A0PSJ1A";
-
-// Função para chamar a API de séries temporais
-const fetchTimeSeries = async (
-  lat: number, 
-  lng: number,
-  setModalData: (data: TimeSeriesData | null) => void,
-  setModalLoading: (loading: boolean) => void,
-  setModalError: (error: string | null) => void,
-  setModalCoordinates: (coords: { lat: number; lng: number } | null) => void,
-  setModalOpen: (open: boolean) => void
-): Promise<void> => {
-  try {
-    setModalLoading(true);
-    setModalError(null);
-    setModalData(null);
-    setModalCoordinates({ lat, lng });
-    setModalOpen(true);
-
-    const data = await skyHawkService.getTimeSeries({ lat, lng });
-    
-    console.log('=== DADOS DA SÉRIE TEMPORAL ===');
-    console.log('Coordenadas:', { lat, lng });
-    console.log('Sucesso:', data.success);
-    console.log('Metadados:', data.data.metadata);
-    console.log('Número de pontos na série:', data.data.timeline.length);
-    console.log('Dados completos:', data);
-    console.log('================================');
-    
-    setModalData(data);
-    
-  } catch (error) {
-    console.error('Erro ao buscar dados da série temporal:', error);
-    setModalError(error instanceof Error ? error.message : 'Erro desconhecido. Verifique se o backend está rodando em http://localhost:5000');
-  } finally {
-    setModalLoading(false);
-  }
-};
 
 const MapComponent = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -49,12 +15,86 @@ const MapComponent = () => {
   const [markers, setMarkers] = useState<mapboxgl.Marker[]>([]);
   const [selectionMode] = useState(false);
 
-  // Estados do Modal
-  const [modalOpen, setModalOpen] = useState(false);
+  // Estados do Modal (consolidados)
+  const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState<TimeSeriesData | null>(null);
+  const [modalCoordinates, setModalCoordinates] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
-  const [modalCoordinates, setModalCoordinates] = useState<{ lat: number; lng: number } | null>(null);
+
+  // Função para buscar dados com filtros (corrigida)
+  const fetchSatelliteData = async (
+    coordinates: { lat: number; lng: number },
+    filters?: {
+      satellite: string;
+      variable: string;
+      startDate: string;
+      endDate: string;
+    }
+  ) => {
+    setModalLoading(true);
+    setModalError(null);
+    setModalData(null);
+    setModalCoordinates(coordinates);
+    setShowModal(true);
+
+    try {
+      // Filtros padrão se não fornecidos
+      const defaultFilters = {
+        satellite: "landsat8",
+        variable: "ndvi",
+        startDate: "2023-01-01",
+        endDate: "2023-12-31",
+      };
+
+      const activeFilters = filters || defaultFilters;
+
+      console.log("=== BUSCANDO DADOS SATELITAIS ===");
+      console.log("Coordenadas:", coordinates);
+      console.log("Filtros:", activeFilters);
+      console.log("================================");
+
+      // Usar o serviço correto
+      const data = await skyHawkService.getTimeSeries(
+        coordinates.lat,
+        coordinates.lng,
+        activeFilters
+      );
+
+      console.log("=== DADOS RECEBIDOS ===");
+      console.log("Sucesso:", data.success);
+      console.log("Metadados:", data.data?.metadata);
+      console.log("Número de pontos:", data.data?.timeline?.length);
+      console.log("=====================");
+
+      setModalData(data);
+    } catch (error) {
+      console.error("Erro ao buscar dados satelitais:", error);
+      setModalError(
+        error instanceof Error
+          ? error.message
+          : "Erro desconhecido ao buscar dados satelitais"
+      );
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  // Handler para mudança de filtros
+  const handleFiltersChange = (filters: {
+    satellite: string;
+    variable: string;
+    startDate: string;
+    endDate: string;
+  }) => {
+    console.log("Filtros alterados:", filters);
+    if (modalCoordinates) {
+      fetchSatelliteData(modalCoordinates, filters);
+    }
+  };
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -68,22 +108,14 @@ const MapComponent = () => {
 
     mapRef.current = map;
 
-    // Click simples para adicionar marcadores (quando não estiver em modo de seleção)
+    // Click simples para adicionar marcadores
     map.on("click", (e) => {
       if (!selectionMode) {
         const { lng, lat } = e.lngLat;
-        console.log(`Ponto selecionado: ${lng}, ${lat}`);
+        console.log(`Ponto clicado: ${lat}, ${lng}`);
 
-        // Chamar a API para obter dados da série temporal
-        fetchTimeSeries(
-          lat, 
-          lng, 
-          setModalData, 
-          setModalLoading, 
-          setModalError, 
-          setModalCoordinates, 
-          setModalOpen
-        );
+        // Buscar dados satelitais
+        fetchSatelliteData({ lat, lng });
 
         // Criar marcador padrão do Mapbox
         const marker = new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
@@ -94,7 +126,7 @@ const MapComponent = () => {
         markerElement.title = "Clique para remover este marcador";
 
         markerElement.addEventListener("click", (event) => {
-          event.stopPropagation(); // Evita propagar o clique para o mapa
+          event.stopPropagation();
           marker.remove();
           setMarkers((prevMarkers) => prevMarkers.filter((m) => m !== marker));
           console.log("Marcador removido");
@@ -104,6 +136,11 @@ const MapComponent = () => {
         setMarkers((prevMarkers) => [...prevMarkers, marker]);
       }
     });
+
+    return () => {
+      // Cleanup quando o componente desmontar
+      map.remove();
+    };
   }, [selectionMode]);
 
   // Função para limpar todos os marcadores
@@ -116,13 +153,15 @@ const MapComponent = () => {
   };
 
   return (
-    <div style={{ width: "100%", height: "100%", position: "relative" }}>
+    <>
+      <div ref={mapContainer} style={{ width: "100%", height: "100%" }} />
+
       {/* Controles */}
       {markers.length > 0 && (
         <div
           style={{
             position: "absolute",
-            top: "10px",
+            top: "80px",
             left: "10px",
             zIndex: 1000,
           }}
@@ -172,18 +211,17 @@ const MapComponent = () => {
         </div>
       )}
 
-      <div ref={mapContainer} style={{ width: "100%", height: "100%" }} />
-
       {/* Modal para exibir dados da série temporal */}
       <Modal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
         data={modalData}
         coordinates={modalCoordinates}
         loading={modalLoading}
         error={modalError}
+        onFiltersChange={handleFiltersChange}
       />
-    </div>
+    </>
   );
 };
 

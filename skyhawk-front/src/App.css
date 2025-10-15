@@ -1,5 +1,7 @@
 /* Minimal styles for App component so TypeScript / bundler finds the file during build */
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
 }
 

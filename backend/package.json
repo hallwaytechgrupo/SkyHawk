@@ -12,6 +12,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/axios": "^0.9.36",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   },
