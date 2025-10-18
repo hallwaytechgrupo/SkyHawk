@@ -15,30 +15,29 @@ O projeto **SkyHawk** surge como uma solução para este problema, desenvolvendo
 
 | Membro | Papel | GitHub |
 |---|---|---|
-| Vinícius Lemes dos Santos | Scrum Master | [viniilemes](https://github.com/viniilemes) |
 | Christopher Costa | Product Owner | [chriskryon](https://github.com/chriskryon) |
 | Marcos Vinicios S. A. Oliveira | Desenvolvedor | [marcknero](https://github.com/marcknero) |
 | Mário César Vieira Alves | Desenvolvedor | [MarioC3sar](https://github.com/MarioC3sar) |
+| Vinícius Lemes dos Santos | Scrum Master | [viniilemes](https://github.com/viniilemes) |
 
 -----------------------------------------------------
 
 ## Tecnologias Utilizadas
 O projeto foi desenvolvido utilizando um conjunto moderno de tecnologias para garantir desempenho, escalabilidade e facilidade de manutenção:
 
-* **PostgreSQL + PostGIS:** Banco de dados relacional com suporte a dados geoespaciais, utilizados para armazenar e processar informações geográficas.
 * **Node.js:** Plataforma para construção da estrutura do sistema, responsável por fornecer uma API RESTful para o front-end.
 * **React:** Biblioteca JavaScript para construção da interface do usuário, garantindo uma experiência interativa e responsiva.
 * **Vite:** Ferramenta de build rápida e moderna para o front-end, utilizada para desenvolvimento e empacotamento do projeto.
 * **Figma:** Ferramenta de design utilizada para prototipagem e criação de interfaces interativas.
-* **Bibliotecas de Mapas:** Tecnologias como Leaflet, MapBox ou Open Street Maps para a rápida implementação de mapas interativos.
+* **Bibliotecas de Mapas:** Mapbox para a rápida implementação de mapas interativos, com um vizual agradável com seu tema escuro.
 
 <p align="center">
   <img src="./assets/node.svg" alt="Node.js" width="80"/>
   <img src="./assets/react.svg" alt="React" width="80"/>
   <img src="./assets/vite.svg" alt="Vite" width="80"/>
-  <img src="./assets/pgadmin.png" alt="pgAdmin" width="80"/>
   <img src="./assets/postgis.png" alt="PostGIS" width="100"/>
   <img src="./assets/figma.png" alt="Figma" width="80"/>
+  <img src="./assets/mongodb.jpeg" alt="MongoDB" width="80">
 </p>
 
 -----------------------------------------------------
@@ -189,9 +188,9 @@ O crescente volume de dados geoespaciais provenientes de satélites, embora um r
 
 | Código | Tarefa | Definition of Ready | Definition of Done |
 |---|---|---|---|
-| GAP-0004 | Implementação e execução de testes unitários e de integração | Funcionalidades desenvolvidas e documentadas | Testes automatizados executados com cobertura mínima definida |
-| GAP-0005 | Validação dos requisitos funcionais com base nos testes | Testes executados e resultados disponíveis | Checklist de requisitos validado com base nos testes |
-| GAP-0006 | Ajustes técnicos e refinamento do backlog | Feedback dos testes e usuários coletado | Backlog atualizado com melhorias e correções priorizadas |
+| GAP-0005 | Implementação e execução de testes unitários e de integração | Funcionalidades desenvolvidas e documentadas | Testes automatizados executados com cobertura mínima definida |
+| GAP-0006 | Validação dos requisitos funcionais com base nos testes | Testes executados e resultados disponíveis | Checklist de requisitos validado com base nos testes |
+| GAP-0007 | Ajustes técnicos e refinamento do backlog | Feedback dos testes e usuários coletado | Backlog atualizado com melhorias e correções priorizadas |
 | IHC-0002 | Testes de usabilidade com usuários | Protótipo funcional disponível | Relatório de usabilidade com insights e sugestões |
 | IHC-0003 | Refinamento da interface com base no feedback | Relatório de usabilidade analisado | Interface ajustada e validada com novo teste rápido |
 | TC-0003 | Desenvolvimento da lógica de comparação de séries temporais | Dados disponíveis e estrutura de séries pronta | Comparação funcional entre séries de diferentes satélites |
@@ -200,6 +199,7 @@ O crescente volume de dados geoespaciais provenientes de satélites, embora um r
 | BDN-0003 | Implementação de filtros e consultas eficientes | Dados armazenados e filtros definidos | Consultas otimizadas e testadas com diferentes parâmetros |
 | DW-0003 | Visualização lado a lado de séries temporais em gráficos | Dados comparáveis disponíveis | Gráficos exibindo corretamente as séries selecionadas |
 | DW-0004 | Implementação de filtros e painel de controle | Filtros definidos e interface preparada | Painel funcional com filtros aplicáveis e responsivos |
+| DW-0005 | Implementação de filtros e painel de controle | Filtros definidos e interface preparada | Painel funcional com filtros aplicáveis e responsivos |
 
 ---
 
