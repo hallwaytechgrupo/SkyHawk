@@ -39,6 +39,14 @@ interface FilterParams {
   endDate: string;
 }
 
+// Interface para informações de localização
+interface LocationInfo {
+  city: string;
+  state?: string;
+  country: string;
+  loading: boolean;
+}
+
 // Opções dos filtros
 const satelliteOptions = [
   { value: "landsat8", label: "Landsat 8" },
@@ -140,6 +148,59 @@ const Modal: React.FC<ModalProps> = ({
   });
 
   const [showFilters, setShowFilters] = useState(false);
+  const [locationInfo, setLocationInfo] = useState<LocationInfo | null>(null);
+
+  // Função para buscar informações da cidade
+  const fetchLocationInfo = async (lat: number, lng: number) => {
+    setLocationInfo({ city: "", country: "", loading: true });
+
+    try {
+      // Usando OpenStreetMap Nominatim (gratuito, sem API key)
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=pt-BR,pt,en`
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro na geocodificação");
+      }
+
+      const data = await response.json();
+
+      // Extrair informações da resposta
+      const address = data.address || {};
+      const city =
+        address.city ||
+        address.town ||
+        address.village ||
+        address.municipality ||
+        address.county ||
+        "Localização desconhecida";
+
+      const state = address.state || address.region;
+      const country = address.country || "País desconhecido";
+
+      setLocationInfo({
+        city,
+        state,
+        country,
+        loading: false,
+      });
+    } catch (error) {
+      console.error("Erro ao buscar informações da localização:", error);
+      setLocationInfo({
+        city: "Localização não encontrada",
+        country: "",
+        loading: false,
+      });
+    }
+  };
+
+  // Effect para buscar localização quando coordenadas mudarem
+  useEffect(() => {
+    if (coordinates && isOpen) {
+      fetchLocationInfo(coordinates.lat, coordinates.lng);
+    }
+  }, [coordinates, isOpen]);
 
   // Adicionar CSS para animação do loading
   useEffect(() => {
@@ -248,7 +309,7 @@ const Modal: React.FC<ModalProps> = ({
                   letterSpacing: "-0.5px",
                 }}
               >
-                Análise Satelital
+                Análise de Dados dos Satélites
               </h2>
               <p
                 style={{
@@ -482,7 +543,7 @@ const Modal: React.FC<ModalProps> = ({
                     handleFilterChange("startDate", e.target.value)
                   }
                   style={{
-                    width: "100%",
+                    width: "80%",
                     padding: "8px 12px",
                     backgroundColor: "rgba(42, 42, 42, 0.8)",
                     border: "1px solid rgba(255, 255, 255, 0.2)",
@@ -514,7 +575,7 @@ const Modal: React.FC<ModalProps> = ({
                     handleFilterChange("endDate", e.target.value)
                   }
                   style={{
-                    width: "100%",
+                    width: "80%",
                     padding: "8px 12px",
                     backgroundColor: "rgba(42, 42, 42, 0.8)",
                     border: "1px solid rgba(255, 255, 255, 0.2)",
@@ -592,6 +653,7 @@ const Modal: React.FC<ModalProps> = ({
           <div
             style={{
               width: "380px",
+              height: "100%",
               display: "flex",
               flexDirection: "column",
               gap: "16px",
@@ -719,7 +781,7 @@ const Modal: React.FC<ModalProps> = ({
               </div>
             )}
 
-            {/* Coordenadas */}
+            {/* Coordenadas com nome da cidade */}
             {coordinates && (
               <div style={modalStyles.section}>
                 <div
@@ -754,69 +816,151 @@ const Modal: React.FC<ModalProps> = ({
                     Localização
                   </h3>
                 </div>
+
+                {/* Nome da cidade */}
+                <div
+                  style={{
+                    background: "rgba(0, 124, 191, 0.1)",
+                    padding: "12px 16px",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(0, 124, 191, 0.3)",
+                    marginBottom: "12px",
+                    textAlign: "center",
+                  }}
+                >
+                  {locationInfo?.loading ? (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <Loader2
+                        size={14}
+                        color="#007cbf"
+                        style={{
+                          animation: "spin 1s linear infinite",
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          color: "rgba(255, 255, 255, 0.7)",
+                        }}
+                      >
+                        Identificando localização...
+                      </span>
+                    </div>
+                  ) : (
+                    <div>
+                      <div
+                        style={{
+                          fontSize: "16px",
+                          fontWeight: "600",
+                          color: "#007cbf",
+                          marginBottom: "2px",
+                        }}
+                      >
+                        {locationInfo?.city}
+                      </div>
+                      {locationInfo?.state && (
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "rgba(255, 255, 255, 0.7)",
+                          }}
+                        >
+                          {locationInfo.state}, {locationInfo.country}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Coordenadas lado a lado */}
                 <div
                   style={{
                     display: "flex",
-                    flexDirection: "column",
-                    gap: "12px",
-                    justifyContent: "center",
+                    gap: "8px",
+                    width: "100%",
                   }}
                 >
+                  {/* Latitude */}
                   <div
                     style={{
                       background: "rgba(42, 42, 42, 0.6)",
-                      padding: "12px 16px",
+                      padding: "8px 12px",
                       borderRadius: "8px",
                       border: "1px solid rgba(255, 255, 255, 0.1)",
+                      flex: 1,
+                      minWidth: 0,
+                      overflow: "hidden",
                     }}
                   >
                     <div
                       style={{
-                        fontSize: "11px",
+                        fontSize: "10px",
                         color: "rgba(255, 255, 255, 0.6)",
                         marginBottom: "2px",
                         fontWeight: "600",
                         textTransform: "uppercase",
+                        whiteSpace: "nowrap",
+                        textAlign: "center",
                       }}
                     >
                       Latitude
                     </div>
                     <div
                       style={{
-                        fontSize: "16px",
+                        fontSize: "14px",
                         fontFamily: "monospace",
                         color: "#007cbf",
                         fontWeight: "bold",
+                        textAlign: "center",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                       }}
                     >
                       {coordinates.lat.toFixed(6)}°
                     </div>
                   </div>
+
+                  {/* Longitude */}
                   <div
                     style={{
                       background: "rgba(42, 42, 42, 0.6)",
-                      padding: "12px 16px",
+                      padding: "8px 12px",
                       borderRadius: "8px",
                       border: "1px solid rgba(255, 255, 255, 0.1)",
+                      flex: 1,
+                      minWidth: 0,
+                      overflow: "hidden",
                     }}
                   >
                     <div
                       style={{
-                        fontSize: "11px",
+                        fontSize: "10px",
                         color: "rgba(255, 255, 255, 0.6)",
                         marginBottom: "2px",
                         fontWeight: "600",
                         textTransform: "uppercase",
+                        whiteSpace: "nowrap",
+                        textAlign: "center",
                       }}
                     >
                       Longitude
                     </div>
                     <div
                       style={{
-                        fontSize: "16px",
+                        fontSize: "14px",
                         fontFamily: "monospace",
                         color: "#007cbf",
                         fontWeight: "bold",
+                        textAlign: "center",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                       }}
                     >
                       {coordinates.lng.toFixed(6)}°
@@ -873,7 +1017,7 @@ const Modal: React.FC<ModalProps> = ({
                   <div
                     style={{
                       background: "rgba(42, 42, 42, 0.6)",
-                      padding: "16px",
+                      padding: "10px",
                       borderRadius: "10px",
                       border: "1px solid rgba(255, 255, 255, 0.08)",
                       textAlign: "center" as const,
