@@ -644,7 +644,7 @@ const Modal: React.FC<ModalProps> = ({
           style={{
             display: "flex",
             gap: "20px",
-            height: "100%",
+            height: "80%",
             overflow: "hidden",
             flex: 1,
           }}
@@ -781,15 +781,21 @@ const Modal: React.FC<ModalProps> = ({
               </div>
             )}
 
-            {/* Coordenadas com nome da cidade */}
+            {/* Coordenadas com nome da cidade - MINIMIZÁVEL */}
             {coordinates && (
-              <div style={modalStyles.section}>
+              <div
+                style={{
+                  ...modalStyles.section,
+                  transition: "all 0.3s ease",
+                  overflow: "hidden",
+                }}
+              >
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
-                    marginBottom: "12px",
+                    marginBottom: showFilters ? "0" : "12px",
                   }}
                 >
                   <div
@@ -817,168 +823,179 @@ const Modal: React.FC<ModalProps> = ({
                   </h3>
                 </div>
 
-                {/* Nome da cidade */}
-                <div
-                  style={{
-                    background: "rgba(0, 124, 191, 0.1)",
-                    padding: "12px 16px",
-                    borderRadius: "8px",
-                    border: "1px solid rgba(0, 124, 191, 0.3)",
-                    marginBottom: "12px",
-                    textAlign: "center",
-                  }}
-                >
-                  {locationInfo?.loading ? (
+                {/* Conteúdo que será ocultado quando filtros ativos */}
+                {!showFilters && (
+                  <>
+                    {/* Nome da cidade */}
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
+                        background: "rgba(0, 124, 191, 0.1)",
+                        padding: "12px 16px",
+                        borderRadius: "8px",
+                        border: "1px solid rgba(0, 124, 191, 0.3)",
+                        marginBottom: "12px",
+                        textAlign: "center",
                       }}
                     >
-                      <Loader2
-                        size={14}
-                        color="#007cbf"
-                        style={{
-                          animation: "spin 1s linear infinite",
-                        }}
-                      />
-                      <span
-                        style={{
-                          fontSize: "12px",
-                          color: "rgba(255, 255, 255, 0.7)",
-                        }}
-                      >
-                        Identificando localização...
-                      </span>
-                    </div>
-                  ) : (
-                    <div>
-                      <div
-                        style={{
-                          fontSize: "16px",
-                          fontWeight: "600",
-                          color: "#007cbf",
-                          marginBottom: "2px",
-                        }}
-                      >
-                        {locationInfo?.city}
-                      </div>
-                      {locationInfo?.state && (
+                      {locationInfo?.loading ? (
                         <div
                           style={{
-                            fontSize: "12px",
-                            color: "rgba(255, 255, 255, 0.7)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "8px",
                           }}
                         >
-                          {locationInfo.state}, {locationInfo.country}
+                          <Loader2
+                            size={14}
+                            color="#007cbf"
+                            style={{
+                              animation: "spin 1s linear infinite",
+                            }}
+                          />
+                          <span
+                            style={{
+                              fontSize: "12px",
+                              color: "rgba(255, 255, 255, 0.7)",
+                            }}
+                          >
+                            Identificando localização...
+                          </span>
+                        </div>
+                      ) : (
+                        <div>
+                          <div
+                            style={{
+                              fontSize: "16px",
+                              fontWeight: "600",
+                              color: "#007cbf",
+                              marginBottom: "2px",
+                            }}
+                          >
+                            {locationInfo?.city}
+                          </div>
+                          {locationInfo?.state && (
+                            <div
+                              style={{
+                                fontSize: "12px",
+                                color: "rgba(255, 255, 255, 0.7)",
+                              }}
+                            >
+                              {locationInfo.state}, {locationInfo.country}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
 
-                {/* Coordenadas lado a lado */}
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "8px",
-                    width: "100%",
-                  }}
-                >
-                  {/* Latitude */}
-                  <div
-                    style={{
-                      background: "rgba(42, 42, 42, 0.6)",
-                      padding: "8px 12px",
-                      borderRadius: "8px",
-                      border: "1px solid rgba(255, 255, 255, 0.1)",
-                      flex: 1,
-                      minWidth: 0,
-                      overflow: "hidden",
-                    }}
-                  >
+                    {/* Coordenadas lado a lado */}
                     <div
                       style={{
-                        fontSize: "10px",
-                        color: "rgba(255, 255, 255, 0.6)",
-                        marginBottom: "2px",
-                        fontWeight: "600",
-                        textTransform: "uppercase",
-                        whiteSpace: "nowrap",
-                        textAlign: "center",
+                        display: "flex",
+                        gap: "8px",
+                        width: "100%",
                       }}
                     >
-                      Latitude
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "14px",
-                        fontFamily: "monospace",
-                        color: "#007cbf",
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {coordinates.lat.toFixed(6)}°
-                    </div>
-                  </div>
+                      {/* Latitude */}
+                      <div
+                        style={{
+                          background: "rgba(42, 42, 42, 0.6)",
+                          padding: "8px 12px",
+                          borderRadius: "8px",
+                          border: "1px solid rgba(255, 255, 255, 0.1)",
+                          flex: 1,
+                          minWidth: 0,
+                          overflow: "hidden",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "10px",
+                            color: "rgba(255, 255, 255, 0.6)",
+                            marginBottom: "2px",
+                            fontWeight: "600",
+                            textTransform: "uppercase",
+                            whiteSpace: "nowrap",
+                            textAlign: "center",
+                          }}
+                        >
+                          Latitude
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "14px",
+                            fontFamily: "monospace",
+                            color: "#007cbf",
+                            fontWeight: "bold",
+                            textAlign: "center",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {coordinates.lat.toFixed(6)}°
+                        </div>
+                      </div>
 
-                  {/* Longitude */}
-                  <div
-                    style={{
-                      background: "rgba(42, 42, 42, 0.6)",
-                      padding: "8px 12px",
-                      borderRadius: "8px",
-                      border: "1px solid rgba(255, 255, 255, 0.1)",
-                      flex: 1,
-                      minWidth: 0,
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "10px",
-                        color: "rgba(255, 255, 255, 0.6)",
-                        marginBottom: "2px",
-                        fontWeight: "600",
-                        textTransform: "uppercase",
-                        whiteSpace: "nowrap",
-                        textAlign: "center",
-                      }}
-                    >
-                      Longitude
+                      {/* Longitude */}
+                      <div
+                        style={{
+                          background: "rgba(42, 42, 42, 0.6)",
+                          padding: "8px 12px",
+                          borderRadius: "8px",
+                          border: "1px solid rgba(255, 255, 255, 0.1)",
+                          flex: 1,
+                          minWidth: 0,
+                          overflow: "hidden",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "10px",
+                            color: "rgba(255, 255, 255, 0.6)",
+                            marginBottom: "2px",
+                            fontWeight: "600",
+                            textTransform: "uppercase",
+                            whiteSpace: "nowrap",
+                            textAlign: "center",
+                          }}
+                        >
+                          Longitude
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "14px",
+                            fontFamily: "monospace",
+                            color: "#007cbf",
+                            fontWeight: "bold",
+                            textAlign: "center",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {coordinates.lng.toFixed(6)}°
+                        </div>
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        fontSize: "14px",
-                        fontFamily: "monospace",
-                        color: "#007cbf",
-                        fontWeight: "bold",
-                        textAlign: "center",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {coordinates.lng.toFixed(6)}°
-                    </div>
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
             )}
 
-            {/* KPIs */}
+            {/* KPIs - MINIMIZÁVEL */}
             {stats && (
-              <div style={modalStyles.section}>
+              <div
+                style={{
+                  ...modalStyles.section,
+                  transition: "all 0.3s ease",
+                  overflow: "hidden",
+                }}
+              >
                 <div
                   style={{
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
-                    marginBottom: "16px",
+                    marginBottom: showFilters ? "0" : "16px",
                   }}
                 >
                   <div
@@ -1005,143 +1022,146 @@ const Modal: React.FC<ModalProps> = ({
                   </h3>
                 </div>
 
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    gap: "12px",
-                    justifyContent: "center",
-                  }}
-                >
-                  {/* Valor Mínimo */}
+                {/* Conteúdo que será ocultado quando filtros ativos */}
+                {!showFilters && (
                   <div
                     style={{
-                      background: "rgba(42, 42, 42, 0.6)",
-                      padding: "10px",
-                      borderRadius: "10px",
-                      border: "1px solid rgba(255, 255, 255, 0.08)",
-                      textAlign: "center" as const,
+                      display: "flex",
+                      flexDirection: "row",
+                      gap: "12px",
+                      justifyContent: "center",
                     }}
                   >
+                    {/* Valor Mínimo */}
                     <div
                       style={{
-                        color: "rgba(255, 255, 255, 0.6)",
-                        fontSize: "11px",
-                        fontWeight: "500",
-                        marginBottom: "6px",
-                        textTransform: "uppercase",
+                        background: "rgba(42, 42, 42, 0.6)",
+                        padding: "10px",
+                        borderRadius: "10px",
+                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        textAlign: "center" as const,
                       }}
                     >
-                      Valor Mínimo
+                      <div
+                        style={{
+                          color: "rgba(255, 255, 255, 0.6)",
+                          fontSize: "11px",
+                          fontWeight: "500",
+                          marginBottom: "6px",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        Valor Mínimo
+                      </div>
+                      <div
+                        style={{
+                          color: "white",
+                          fontSize: "22px",
+                          fontWeight: "600",
+                          fontFamily: "monospace",
+                          lineHeight: "1",
+                        }}
+                      >
+                        {stats.min.toFixed(4)}
+                      </div>
+                      <div
+                        style={{
+                          color: "rgba(255, 255, 255, 0.5)",
+                          fontSize: "10px",
+                          marginTop: "4px",
+                        }}
+                      >
+                        Low Value
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        color: "white",
-                        fontSize: "22px",
-                        fontWeight: "600",
-                        fontFamily: "monospace",
-                        lineHeight: "1",
-                      }}
-                    >
-                      {stats.min.toFixed(4)}
-                    </div>
-                    <div
-                      style={{
-                        color: "rgba(255, 255, 255, 0.5)",
-                        fontSize: "10px",
-                        marginTop: "4px",
-                      }}
-                    >
-                      Low Value
-                    </div>
-                  </div>
 
-                  {/* Valor Máximo */}
-                  <div
-                    style={{
-                      background: "rgba(42, 42, 42, 0.6)",
-                      padding: "16px",
-                      borderRadius: "10px",
-                      border: "1px solid rgba(255, 255, 255, 0.08)",
-                      textAlign: "center" as const,
-                    }}
-                  >
+                    {/* Valor Máximo */}
                     <div
                       style={{
-                        color: "rgba(255, 255, 255, 0.6)",
-                        fontSize: "11px",
-                        fontWeight: "500",
-                        marginBottom: "6px",
-                        textTransform: "uppercase",
+                        background: "rgba(42, 42, 42, 0.6)",
+                        padding: "16px",
+                        borderRadius: "10px",
+                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        textAlign: "center" as const,
                       }}
                     >
-                      Valor Máximo
+                      <div
+                        style={{
+                          color: "rgba(255, 255, 255, 0.6)",
+                          fontSize: "11px",
+                          fontWeight: "500",
+                          marginBottom: "6px",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        Valor Máximo
+                      </div>
+                      <div
+                        style={{
+                          color: "white",
+                          fontSize: "22px",
+                          fontWeight: "600",
+                          fontFamily: "monospace",
+                          lineHeight: "1",
+                        }}
+                      >
+                        {stats.max.toFixed(4)}
+                      </div>
+                      <div
+                        style={{
+                          color: "rgba(255, 255, 255, 0.5)",
+                          fontSize: "10px",
+                          marginTop: "4px",
+                        }}
+                      >
+                        Peak Value
+                      </div>
                     </div>
-                    <div
-                      style={{
-                        color: "white",
-                        fontSize: "22px",
-                        fontWeight: "600",
-                        fontFamily: "monospace",
-                        lineHeight: "1",
-                      }}
-                    >
-                      {stats.max.toFixed(4)}
-                    </div>
-                    <div
-                      style={{
-                        color: "rgba(255, 255, 255, 0.5)",
-                        fontSize: "10px",
-                        marginTop: "4px",
-                      }}
-                    >
-                      Peak Value
-                    </div>
-                  </div>
 
-                  {/* Valor Médio */}
-                  <div
-                    style={{
-                      background: "rgba(42, 42, 42, 0.6)",
-                      padding: "16px",
-                      borderRadius: "10px",
-                      border: "1px solid rgba(255, 255, 255, 0.08)",
-                      textAlign: "center" as const,
-                    }}
-                  >
+                    {/* Valor Médio */}
                     <div
                       style={{
-                        color: "rgba(255, 255, 255, 0.6)",
-                        fontSize: "11px",
-                        fontWeight: "500",
-                        marginBottom: "6px",
-                        textTransform: "uppercase",
+                        background: "rgba(42, 42, 42, 0.6)",
+                        padding: "16px",
+                        borderRadius: "10px",
+                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        textAlign: "center" as const,
                       }}
                     >
-                      Valor <br /> Médio
-                    </div>
-                    <div
-                      style={{
-                        color: "white",
-                        fontSize: "22px",
-                        fontWeight: "600",
-                        fontFamily: "monospace",
-                        lineHeight: "1",
-                      }}
-                    >
-                      {stats.avg.toFixed(4)}
-                    </div>
-                    <div
-                      style={{
-                        color: "rgba(255, 255, 255, 0.5)",
-                        fontSize: "10px",
-                        marginTop: "4px",
-                      }}
-                    >
-                      Average
+                      <div
+                        style={{
+                          color: "rgba(255, 255, 255, 0.6)",
+                          fontSize: "11px",
+                          fontWeight: "500",
+                          marginBottom: "6px",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        Valor <br /> Médio
+                      </div>
+                      <div
+                        style={{
+                          color: "white",
+                          fontSize: "22px",
+                          fontWeight: "600",
+                          fontFamily: "monospace",
+                          lineHeight: "1",
+                        }}
+                      >
+                        {stats.avg.toFixed(4)}
+                      </div>
+                      <div
+                        style={{
+                          color: "rgba(255, 255, 255, 0.5)",
+                          fontSize: "10px",
+                          marginTop: "4px",
+                        }}
+                      >
+                        Average
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
           </div>
