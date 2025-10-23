@@ -26,5 +26,18 @@ export const config = {
     variable: 'NDVI',
     bboxDelta: 0.01, // ~1km
     maxResults: 20,
+    // Parâmetros específicos para o fluxo STAC
+    itemsLimit: 20,
+    maxItemsLimit: 100,
+    // Bbox padrão (Brasil aproximado)
+    defaultBbox: [-74.0, -34.0, -34.0, 5.0]
+  },
+
+  // Coleções principais do INPE STAC
+  mainCollections: {
+    sentinel2: 'S2_L2A-1',
+    landsat8: 'LC8_L1-1', 
+    cbers4: 'CBERS4_MUX_L4-1',
+    modis: 'MOD13Q1-6.1'
   },
 };

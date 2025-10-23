@@ -1,5 +1,5 @@
 /**
- * Rotas para séries temporais
+ * Rotas para séries temporais (apenas consultas GET)
  */
 
 import { Router } from 'express';
@@ -7,11 +7,11 @@ import * as timeseriesController from '../controllers/timeseries.controller';
 
 const router = Router();
 
-// POST /api/time-series - Obter série temporal
-router.post('/time-series', timeseriesController.getTimeSeries);
+// GET /api/time-series - Obter série temporal via query params
+router.get('/time-series', timeseriesController.getTimeSeries);
 
-// POST /api/compare - Comparar múltiplas séries
-router.post('/compare', timeseriesController.compareTimeSeries);
+// GET /api/compare - Comparar múltiplas séries via query params
+router.get('/compare', timeseriesController.compareTimeSeries);
 
 // GET /api/export - Exportar dados
 router.get('/export', timeseriesController.exportData);

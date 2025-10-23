@@ -1,5 +1,5 @@
 /**
- * Controller para gerenciar séries temporais
+ * Controller para gerenciar séries temporais (apenas consultas GET)
  */
 
 import { Request, Response } from 'express';
@@ -8,69 +8,100 @@ import * as wtssService from '../services/wtss.service';
 import * as stacService from '../services/stac.service';
 
 /**
- * POST /api/time-series
+ * GET /api/time-series?lat=-23.3&lng=-45.96&collection=mod13q1-6.1&variable=NDVI&startDate=2024-01-01&endDate=2024-10-06
  * Retorna série temporal de NDVI para um ponto
  */
 export async function getTimeSeries(req: Request, res: Response): Promise<void> {
-  const { lat, lng, collection, variable, startDate, endDate } = req.body;
+  const { lat, lng, collection, variable, startDate, endDate } = req.query;
 
   if (!lat || !lng) {
-    res.status(400).json({ error: 'Latitude e longitude são obrigatórios' });
+    res.status(400).json({ 
+      success: false,
+      error: 'Parâmetros lat e lng são obrigatórios' 
+    });
     return;
   }
 
   try {
-    const coverage = collection || 'mod13q1-6.1'; // Nome correto WTSS (minúsculo!)
-    const attributes = [variable || config.defaults.variable]; // Array de variáveis
+    const numLat = parseFloat(lat as string);
+    const numLng = parseFloat(lng as string);
+    const coverage = collection as string || 'mod13q1-6.1';
+    const attributes = [variable as string || config.defaults.variable];
     
     const series = await wtssService.getTimeSeries(
-      lat,
-      lng,
+      numLat,
+      numLng,
       coverage,
       attributes,
-      startDate || config.defaults.startDate,
-      endDate || config.defaults.endDate
+      startDate as string || config.defaults.startDate,
+      endDate as string || config.defaults.endDate
     );
 
     res.json({
       success: true,
+      searchParams: {
+        point: { lat: numLat, lng: numLng },
+        collection: coverage,
+        variable: attributes[0],
+        period: `${startDate || config.defaults.startDate}/${endDate || config.defaults.endDate}`
+      },
       data: series,
       source: 'INPE WTSS v4'
     });
   } catch (error) {
     console.error('Erro em getTimeSeries:', error);
-    res.status(500).json({ error: 'Erro ao buscar série temporal' });
+    res.status(500).json({ 
+      success: false,
+      error: 'Erro ao buscar série temporal' 
+    });
   }
 }
 
 /**
- * POST /api/compare
+ * GET /api/compare?lat=-23.3&lng=-45.96&collections=mod13q1-6.1,S2-16D-2&variable=NDVI&startDate=2024-01-01&endDate=2024-10-06
  * Compara séries temporais de múltiplos satélites
  */
 export async function compareTimeSeries(req: Request, res: Response): Promise<void> {
-  const { lat, lng, collections, variable, startDate, endDate } = req.body;
+  const { lat, lng, collections, variable, startDate, endDate } = req.query;
 
   if (!lat || !lng) {
-    res.status(400).json({ error: 'Latitude e longitude são obrigatórios' });
+    res.status(400).json({ 
+      success: false,
+      error: 'Parâmetros lat e lng são obrigatórios' 
+    });
     return;
   }
 
-  if (!collections || collections.length < 2) {
-    res.status(400).json({ error: 'Mínimo de 2 coleções necessário para comparação' });
+  if (!collections) {
+    res.status(400).json({ 
+      success: false,
+      error: 'Parâmetro collections é obrigatório (separados por vírgula)' 
+    });
     return;
   }
 
   try {
-    const coverages = collections; // Array de coverages (satélites)
-    const attributes = [variable || config.defaults.variable]; // Array de variáveis
+    const numLat = parseFloat(lat as string);
+    const numLng = parseFloat(lng as string);
+    const parsedCollections = (collections as string).split(',');
+    
+    if (parsedCollections.length < 2) {
+      res.status(400).json({ 
+        success: false,
+        error: 'Mínimo de 2 coleções necessário para comparação' 
+      });
+      return;
+    }
+
+    const attributes = [variable as string || config.defaults.variable];
     
     const series = await wtssService.getMultipleTimeSeries(
-      lat,
-      lng,
-      coverages,
+      numLat,
+      numLng,
+      parsedCollections,
       attributes,
-      startDate || config.defaults.startDate,
-      endDate || config.defaults.endDate
+      startDate as string || config.defaults.startDate,
+      endDate as string || config.defaults.endDate
     );
 
     const alignedSeries = series.map(s => ({
@@ -82,24 +113,36 @@ export async function compareTimeSeries(req: Request, res: Response): Promise<vo
 
     res.json({
       success: true,
+      searchParams: {
+        point: { lat: numLat, lng: numLng },
+        collections: parsedCollections,
+        variable: attributes[0],
+        period: `${startDate || config.defaults.startDate}/${endDate || config.defaults.endDate}`
+      },
       comparison: alignedSeries,
       source: 'INPE WTSS v4'
     });
   } catch (error) {
     console.error('Erro em compareTimeSeries:', error);
-    res.status(500).json({ error: 'Erro ao comparar séries temporais' });
+    res.status(500).json({ 
+      success: false,
+      error: 'Erro ao comparar séries temporais' 
+    });
   }
 }
 
 /**
- * GET /api/export
+ * GET /api/export?type=csv&collections=mod13q1-6.1,S2-16D-2&variable=NDVI&startDate=2024-01-01&endDate=2024-10-06&lat=-23.3&lng=-45.96
  * Exporta dados em JSON ou CSV
  */
 export async function exportData(req: Request, res: Response): Promise<void> {
   const { type = 'json', collections, variable, startDate, endDate, lat, lng } = req.query;
 
   if (!collections || !lat || !lng) {
-    res.status(400).json({ error: 'Coleções, latitude e longitude são obrigatórios' });
+    res.status(400).json({ 
+      success: false,
+      error: 'Parâmetros collections, lat e lng são obrigatórios' 
+    });
     return;
   }
 
@@ -120,7 +163,7 @@ export async function exportData(req: Request, res: Response): Promise<void> {
         numLat,
         numLng,
         parsedCollections,
-        [variable as string || config.defaults.variable], // Array!
+        [variable as string || config.defaults.variable],
         startDate as string || config.defaults.startDate,
         endDate as string || config.defaults.endDate
       )
@@ -135,6 +178,7 @@ export async function exportData(req: Request, res: Response): Promise<void> {
       },
       metadados: items.features,
       series,
+      exportedAt: new Date().toISOString(),
       source: 'INPE STAC/WTSS - Export'
     };
 
@@ -148,12 +192,15 @@ export async function exportData(req: Request, res: Response): Promise<void> {
         )
       );
       res.header('Content-Type', 'text/csv');
-      res.attachment('export.csv');
+      res.header('Content-Disposition', 'attachment; filename=export.csv');
       res.send(csv);
     }
   } catch (error) {
     console.error('Erro em exportData:', error);
-    res.status(500).json({ error: 'Erro ao exportar dados' });
+    res.status(500).json({ 
+      success: false,
+      error: 'Erro ao exportar dados' 
+    });
   }
 }
 
@@ -190,11 +237,15 @@ export async function listSatellites(req: Request, res: Response): Promise<void>
     res.json({
       success: true,
       satellites,
+      total: satellites.length,
       source: 'INPE WTSS v4'
     });
   } catch (error) {
     console.error('Erro em listSatellites:', error);
-    res.status(500).json({ error: 'Erro ao listar satélites' });
+    res.status(500).json({ 
+      success: false,
+      error: 'Erro ao listar satélites' 
+    });
   }
 }
 
@@ -209,7 +260,10 @@ export async function getSatelliteInfo(req: Request, res: Response): Promise<voi
     const info = await wtssService.describeCoverage(name);
     
     if (!info) {
-      res.status(404).json({ error: 'Satélite não encontrado' });
+      res.status(404).json({ 
+        success: false,
+        error: `Satélite ${name} não encontrado` 
+      });
       return;
     }
 
@@ -220,6 +274,9 @@ export async function getSatelliteInfo(req: Request, res: Response): Promise<voi
     });
   } catch (error) {
     console.error('Erro em getSatelliteInfo:', error);
-    res.status(500).json({ error: 'Erro ao buscar informações do satélite' });
+    res.status(500).json({ 
+      success: false,
+      error: 'Erro ao buscar informações do satélite' 
+    });
   }
 }

@@ -1,9 +1,8 @@
 {
   "info": {
-    "name": "SkyHawk API - Monitoramento por Satélite",
-    "description": "API para consulta de séries temporais de dados de satélite (STAC + WTSS) do INPE.\n\n## 🎯 Passo a Passo de Uso:\n\n1. **Health Check** - Verificar se a API está online\n2. **Listar Satélites** - Ver quais satélites estão disponíveis\n3. **Série Temporal Simples** - Obter NDVI de um ponto\n4. **Comparar Satélites** - Comparar MODIS vs Sentinel-2\n5. **Informações do Satélite** - Ver detalhes (variáveis, período, resolução)\n6. **Exportar Dados** - Download em JSON ou CSV\n\n## 📡 Satélites Disponíveis:\n- **mod13q1-6.1** - MODIS Terra (250m, 16 dias)\n- **myd13q1-6.1** - MODIS Aqua (250m, 16 dias)\n- **S2-16D-2** - Sentinel-2 (10m, 5 dias)\n- **LANDSAT-16D-1** - Landsat (30m, 16 dias)\n\n## 🌍 Coordenadas de Teste:\n- São Paulo: -23.3, -45.96\n- Amazônia: -3.1, -60.0\n- Cerrado (MT): -15.5, -56.2\n- Pantanal: -18.0, -56.5",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "skyhawk-api"
+    "name": "SkyHawk API - Consulta de Dados",
+    "description": "API para consulta de séries temporais e navegação de dados de satélite do INPE.\n\n## 🎯 Fluxo de Uso (Todos GET):\n\n### 📊 **Análise de Séries Temporais**\n1. **Health Check** - Verificar se a API está online\n2. **Listar Satélites** - Ver quais satélites estão disponíveis\n3. **Série Temporal** - Obter NDVI de um ponto via query params\n4. **Comparar Satélites** - Comparar MODIS vs Sentinel-2 via query params\n5. **Exportar Dados** - Download direto em JSON ou CSV\n\n### 🗂️ **Navegação STAC**\n1. **Catálogo** - Ver informações gerais da API STAC\n2. **Coleções Cards** - Ver cards de todas as coleções\n3. **Detalhes da Coleção** - Ver informações específicas\n4. **Itens Cards** - Ver cards das imagens disponíveis\n5. **Buscar por Área** - Filtrar por coordenadas via query params\n\n## 📡 Satélites Disponíveis:\n- **mod13q1-6.1** - MODIS Terra (250m, 16 dias)\n- **myd13q1-6.1** - MODIS Aqua (250m, 16 dias)\n- **S2-16D-2** - Sentinel-2 (10m, 5 dias)\n- **LANDSAT-16D-1** - Landsat (30m, 16 dias)\n\n## 🌍 Coordenadas de Teste:\n- São Paulo: lat=-23.3, lng=-45.96\n- Amazônia: lat=-3.1, lng=-60.0\n- Cerrado: lat=-15.5, lng=-56.2\n- Pantanal: lat=-18.0, lng=-56.5",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
@@ -21,18 +20,31 @@
               "port": "5000",
               "path": ["health"]
             },
-            "description": "✅ Verifica se a API está online e funcionando.\n\n**Resposta esperada:**\n```json\n{\n  \"status\": \"ok\",\n  \"timestamp\": \"2024-10-06T18:30:00.000Z\"\n}\n```"
-          },
-          "response": []
+            "description": "✅ Verifica se a API está online e funcionando."
+          }
+        },
+        {
+          "name": "API Info & Endpoints",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": [""]
+            },
+            "description": "📋 Lista todos os endpoints disponíveis e exemplos de uso."
+          }
         }
-      ],
-      "description": "Endpoints básicos para verificar o status da API"
+      ]
     },
     {
-      "name": "2. Listar Satélites",
+      "name": "2. Séries Temporais",
       "item": [
         {
-          "name": "Listar Todos os Satélites",
+          "name": "Listar Satélites Disponíveis",
           "request": {
             "method": "GET",
             "header": [],
@@ -43,9 +55,77 @@
               "port": "5000",
               "path": ["api", "satellites"]
             },
-            "description": "📡 Lista todos os satélites/coverages disponíveis na API WTSS.\n\n**Use este endpoint PRIMEIRO** para descobrir quais satélites você pode usar.\n\n**Resposta:**\n```json\n{\n  \"success\": true,\n  \"satellites\": [\n    {\n      \"id\": \"mod13q1-6.1\",\n      \"name\": \"MODIS Terra\",\n      \"description\": \"Resolução 250m, revisita 16 dias\"\n    },\n    ...\n  ]\n}\n```"
-          },
-          "response": []
+            "description": "📡 Lista todos os satélites/coverages disponíveis."
+          }
+        },
+        {
+          "name": "Série Temporal - MODIS Terra",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/time-series?lat=-23.3&lng=-45.96&collection=mod13q1-6.1&variable=NDVI&startDate=2024-01-01&endDate=2024-10-06",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "time-series"],
+              "query": [
+                {"key": "lat", "value": "-23.3"},
+                {"key": "lng", "value": "-45.96"},
+                {"key": "collection", "value": "mod13q1-6.1"},
+                {"key": "variable", "value": "NDVI"},
+                {"key": "startDate", "value": "2024-01-01"},
+                {"key": "endDate", "value": "2024-10-06"}
+              ]
+            },
+            "description": "📊 Série temporal de NDVI usando MODIS Terra (São Paulo)."
+          }
+        },
+        {
+          "name": "Série Temporal - Sentinel-2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/time-series?lat=-15.5&lng=-56.2&collection=S2-16D-2&variable=NDVI&startDate=2024-01-01&endDate=2024-10-06",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "time-series"],
+              "query": [
+                {"key": "lat", "value": "-15.5"},
+                {"key": "lng", "value": "-56.2"},
+                {"key": "collection", "value": "S2-16D-2"},
+                {"key": "variable", "value": "NDVI"},
+                {"key": "startDate", "value": "2024-01-01"},
+                {"key": "endDate", "value": "2024-10-06"}
+              ]
+            },
+            "description": "📊 Série temporal usando Sentinel-2 (Cerrado - MT)."
+          }
+        },
+        {
+          "name": "Comparar MODIS vs Sentinel-2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/compare?lat=-23.3&lng=-45.96&collections=mod13q1-6.1,S2-16D-2&variable=NDVI&startDate=2024-01-01&endDate=2024-10-06",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "compare"],
+              "query": [
+                {"key": "lat", "value": "-23.3"},
+                {"key": "lng", "value": "-45.96"},
+                {"key": "collections", "value": "mod13q1-6.1,S2-16D-2"},
+                {"key": "variable", "value": "NDVI"},
+                {"key": "startDate", "value": "2024-01-01"},
+                {"key": "endDate", "value": "2024-10-06"}
+              ]
+            },
+            "description": "🔄 Compara séries temporais de múltiplos satélites."
+          }
         },
         {
           "name": "Informações do MODIS Terra",
@@ -59,218 +139,13 @@
               "port": "5000",
               "path": ["api", "satellite", "mod13q1-6.1", "info"]
             },
-            "description": "🔍 Retorna informações detalhadas sobre um satélite específico:\n- Variáveis disponíveis (NDVI, EVI, RED, NIR, etc.)\n- Período temporal disponível\n- Resolução espacial\n- Área coberta\n\n**Substitua `mod13q1-6.1` por:**\n- `myd13q1-6.1` (MODIS Aqua)\n- `S2-16D-2` (Sentinel-2)\n- `LANDSAT-16D-1` (Landsat)"
-          },
-          "response": []
-        },
-        {
-          "name": "Informações do Sentinel-2",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:5000/api/satellite/S2-16D-2/info",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "satellite", "S2-16D-2", "info"]
-            },
-            "description": "🔍 Informações sobre o Sentinel-2 (resolução 10m)"
-          },
-          "response": []
+            "description": "🔍 Informações detalhadas sobre um satélite específico."
+          }
         }
-      ],
-      "description": "Endpoints para descobrir satélites e suas características"
+      ]
     },
     {
-      "name": "3. Séries Temporais",
-      "item": [
-        {
-          "name": "Série Temporal - MODIS Terra",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"lat\": -23.3,\n  \"lng\": -45.96,\n  \"collection\": \"mod13q1-6.1\",\n  \"variable\": \"NDVI\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-10-06\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/time-series",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "time-series"]
-            },
-            "description": "📊 **ENDPOINT PRINCIPAL** - Retorna série temporal de NDVI para um ponto.\n\n**Parâmetros:**\n- `lat` (obrigatório): Latitude (-90 a 90)\n- `lng` (obrigatório): Longitude (-180 a 180)\n- `collection` (opcional): ID do satélite (padrão: mod13q1-6.1)\n- `variable` (opcional): Variável desejada (padrão: NDVI)\n- `startDate` (opcional): Data inicial (padrão: 2024-01-01)\n- `endDate` (opcional): Data final (padrão: 2024-10-06)\n\n**Resposta:**\n```json\n{\n  \"success\": true,\n  \"data\": {\n    \"timeline\": [\"2024-01-01\", \"2024-01-17\", ...],\n    \"values\": [0.65, 0.70, 0.72, ...],\n    \"metadata\": {\n      \"collection\": \"mod13q1-6.1\",\n      \"variable\": \"NDVI\",\n      \"resolution\": \"250m\"\n    }\n  }\n}\n```"
-          },
-          "response": []
-        },
-        {
-          "name": "Série Temporal - Sentinel-2",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"lat\": -15.5,\n  \"lng\": -56.2,\n  \"collection\": \"S2-16D-2\",\n  \"variable\": \"NDVI\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-10-06\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/time-series",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "time-series"]
-            },
-            "description": "📊 Série temporal usando Sentinel-2 (10m de resolução).\n\n**Coordenadas:** Cerrado - Mato Grosso (agricultura)"
-          },
-          "response": []
-        },
-        {
-          "name": "Série Temporal - Landsat",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"lat\": -3.1,\n  \"lng\": -60.0,\n  \"collection\": \"LANDSAT-16D-1\",\n  \"variable\": \"NDVI\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-10-06\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/time-series",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "time-series"]
-            },
-            "description": "📊 Série temporal usando Landsat (30m de resolução).\n\n**Coordenadas:** Amazônia (floresta)"
-          },
-          "response": []
-        },
-        {
-          "name": "Série Temporal - EVI (Enhanced Vegetation Index)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"lat\": -23.3,\n  \"lng\": -45.96,\n  \"collection\": \"mod13q1-6.1\",\n  \"variable\": \"EVI\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-10-06\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/time-series",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "time-series"]
-            },
-            "description": "📊 Série temporal usando EVI (Enhanced Vegetation Index).\n\nEVI é mais sensível que NDVI em áreas com muita vegetação."
-          },
-          "response": []
-        }
-      ],
-      "description": "Endpoints para obter séries temporais de índices de vegetação"
-    },
-    {
-      "name": "4. Comparação de Satélites",
-      "item": [
-        {
-          "name": "Comparar MODIS vs Sentinel-2",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"lat\": -23.3,\n  \"lng\": -45.96,\n  \"collections\": [\"mod13q1-6.1\", \"S2-16D-2\"],\n  \"variable\": \"NDVI\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-10-06\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/compare",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "compare"]
-            },
-            "description": "🔄 Compara séries temporais de múltiplos satélites.\n\n**Parâmetros:**\n- `collections` (obrigatório): Array com PELO MENOS 2 satélites\n- Outros parâmetros iguais ao `/time-series`\n\n**Resposta:**\n```json\n{\n  \"success\": true,\n  \"comparison\": [\n    {\n      \"satellite\": \"mod13q1-6.1\",\n      \"timeline\": [...],\n      \"values\": [...],\n      \"variable\": \"NDVI\"\n    },\n    {\n      \"satellite\": \"S2-16D-2\",\n      \"timeline\": [...],\n      \"values\": [...],\n      \"variable\": \"NDVI\"\n    }\n  ]\n}\n```"
-          },
-          "response": []
-        },
-        {
-          "name": "Comparar 3 Satélites (MODIS + Sentinel + Landsat)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"lat\": -15.5,\n  \"lng\": -56.2,\n  \"collections\": [\"mod13q1-6.1\", \"S2-16D-2\", \"LANDSAT-16D-1\"],\n  \"variable\": \"NDVI\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-10-06\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/compare",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "compare"]
-            },
-            "description": "🔄 Compara 3 satélites simultaneamente para análise completa."
-          },
-          "response": []
-        },
-        {
-          "name": "Comparar MODIS Terra vs MODIS Aqua",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"lat\": -23.3,\n  \"lng\": -45.96,\n  \"collections\": [\"mod13q1-6.1\", \"myd13q1-6.1\"],\n  \"variable\": \"NDVI\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-10-06\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/compare",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "compare"]
-            },
-            "description": "🔄 Compara os dois satélites MODIS (Terra e Aqua)."
-          },
-          "response": []
-        }
-      ],
-      "description": "Endpoints para comparar dados de múltiplos satélites"
-    },
-    {
-      "name": "5. Exportação de Dados",
+      "name": "3. Exportação de Dados",
       "item": [
         {
           "name": "Exportar como JSON",
@@ -278,52 +153,23 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:5000/api/export?lat=-23.3&lng=-45.96&collections=mod13q1-6.1&variable=NDVI&startDate=2024-01-01&endDate=2024-10-06&type=json",
+              "raw": "http://localhost:5000/api/export?type=json&lat=-23.3&lng=-45.96&collections=mod13q1-6.1&variable=NDVI&startDate=2024-01-01&endDate=2024-10-06",
               "protocol": "http",
               "host": ["localhost"],
               "port": "5000",
               "path": ["api", "export"],
               "query": [
-                {
-                  "key": "lat",
-                  "value": "-23.3",
-                  "description": "Latitude"
-                },
-                {
-                  "key": "lng",
-                  "value": "-45.96",
-                  "description": "Longitude"
-                },
-                {
-                  "key": "collections",
-                  "value": "mod13q1-6.1",
-                  "description": "Satélites separados por vírgula"
-                },
-                {
-                  "key": "variable",
-                  "value": "NDVI",
-                  "description": "Variável"
-                },
-                {
-                  "key": "startDate",
-                  "value": "2024-01-01",
-                  "description": "Data inicial"
-                },
-                {
-                  "key": "endDate",
-                  "value": "2024-10-06",
-                  "description": "Data final"
-                },
-                {
-                  "key": "type",
-                  "value": "json",
-                  "description": "Formato (json ou csv)"
-                }
+                {"key": "type", "value": "json"},
+                {"key": "lat", "value": "-23.3"},
+                {"key": "lng", "value": "-45.96"},
+                {"key": "collections", "value": "mod13q1-6.1"},
+                {"key": "variable", "value": "NDVI"},
+                {"key": "startDate", "value": "2024-01-01"},
+                {"key": "endDate", "value": "2024-10-06"}
               ]
             },
-            "description": "💾 Exporta dados em formato JSON para download."
-          },
-          "response": []
+            "description": "💾 Exporta dados em formato JSON."
+          }
         },
         {
           "name": "Exportar como CSV",
@@ -331,53 +177,115 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:5000/api/export?lat=-23.3&lng=-45.96&collections=mod13q1-6.1,S2-16D-2&variable=NDVI&startDate=2024-01-01&endDate=2024-10-06&type=csv",
+              "raw": "http://localhost:5000/api/export?type=csv&lat=-23.3&lng=-45.96&collections=mod13q1-6.1,S2-16D-2&variable=NDVI&startDate=2024-01-01&endDate=2024-10-06",
               "protocol": "http",
               "host": ["localhost"],
               "port": "5000",
               "path": ["api", "export"],
               "query": [
-                {
-                  "key": "lat",
-                  "value": "-23.3"
-                },
-                {
-                  "key": "lng",
-                  "value": "-45.96"
-                },
-                {
-                  "key": "collections",
-                  "value": "mod13q1-6.1,S2-16D-2",
-                  "description": "Múltiplos satélites separados por vírgula"
-                },
-                {
-                  "key": "variable",
-                  "value": "NDVI"
-                },
-                {
-                  "key": "startDate",
-                  "value": "2024-01-01"
-                },
-                {
-                  "key": "endDate",
-                  "value": "2024-10-06"
-                },
-                {
-                  "key": "type",
-                  "value": "csv",
-                  "description": "Formato CSV"
-                }
+                {"key": "type", "value": "csv"},
+                {"key": "lat", "value": "-23.3"},
+                {"key": "lng", "value": "-45.96"},
+                {"key": "collections", "value": "mod13q1-6.1,S2-16D-2"},
+                {"key": "variable", "value": "NDVI"},
+                {"key": "startDate", "value": "2024-01-01"},
+                {"key": "endDate", "value": "2024-10-06"}
               ]
             },
-            "description": "💾 Exporta dados em formato CSV.\n\n**Formato do CSV:**\n```csv\nSatellite,Date,Value\nmod13q1-6.1,2024-01-01,0.6523\nmod13q1-6.1,2024-01-17,0.7012\nS2-16D-2,2024-01-01,0.6845\n...\n```"
-          },
-          "response": []
+            "description": "💾 Exporta dados em formato CSV para análise."
+          }
         }
-      ],
-      "description": "Endpoints para exportar dados em JSON ou CSV"
+      ]
     },
     {
-      "name": "6. STAC - Coleções e Imagens",
+      "name": "4. STAC - Navegação",
+      "item": [
+        {
+          "name": "Catálogo STAC Principal",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/catalog",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "catalog"]
+            },
+            "description": "📚 Catálogo principal da API STAC do INPE."
+          }
+        },
+        {
+          "name": "Coleções como Cards",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/collections/cards",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "collections", "cards"]
+            },
+            "description": "🗂️ Lista coleções formatadas como cards para o frontend."
+          }
+        },
+        {
+          "name": "Detalhes Coleção Sentinel-2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/collections/S2_L2A-1/details",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "collections", "S2_L2A-1", "details"]
+            },
+            "description": "🔍 Detalhes completos da coleção Sentinel-2."
+          }
+        },
+        {
+          "name": "Itens Sentinel-2 (Cards)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/collections/S2_L2A-1/items?limit=10",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "collections", "S2_L2A-1", "items"],
+              "query": [
+                {"key": "limit", "value": "10"}
+              ]
+            },
+            "description": "🖼️ Lista itens (imagens) da coleção como cards."
+          }
+        },
+        {
+          "name": "Buscar por Área (São Paulo)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/collections/S2_L2A-1/search?bbox=-47,-24,-46,-23&limit=20",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "collections", "S2_L2A-1", "search"],
+              "query": [
+                {"key": "bbox", "value": "-47,-24,-46,-23"},
+                {"key": "limit", "value": "20"}
+              ]
+            },
+            "description": "🗺️ Busca imagens na região de São Paulo via bbox."
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. STAC - Consultas por Ponto",
       "item": [
         {
           "name": "Listar Coleções STAC",
@@ -391,62 +299,54 @@
               "port": "5000",
               "path": ["api", "collections"]
             },
-            "description": "📚 Lista coleções disponíveis na API STAC (metadados de imagens)."
-          },
-          "response": []
+            "description": "📚 Lista todas as coleções STAC disponíveis."
+          }
         },
         {
-          "name": "Buscar Imagens por Ponto",
+          "name": "Buscar Dados por Ponto",
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"lat\": -23.3,\n  \"lng\": -45.96,\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-10-06\"\n}"
-            },
+            "method": "GET",
+            "header": [],
             "url": {
-              "raw": "http://localhost:5000/api/point",
+              "raw": "http://localhost:5000/api/point?lat=-23.3&lng=-45.96&startDate=2024-01-01&endDate=2024-10-06",
               "protocol": "http",
               "host": ["localhost"],
               "port": "5000",
-              "path": ["api", "point"]
+              "path": ["api", "point"],
+              "query": [
+                {"key": "lat", "value": "-23.3"},
+                {"key": "lng", "value": "-45.96"},
+                {"key": "startDate", "value": "2024-01-01"},
+                {"key": "endDate", "value": "2024-10-06"}
+              ]
             },
-            "description": "🗺️ Busca imagens de satélite disponíveis para um ponto específico (STAC)."
-          },
-          "response": []
+            "description": "🗺️ Busca imagens disponíveis para um ponto específico."
+          }
         },
         {
           "name": "Buscar Imagens com Filtros",
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"lat\": -23.3,\n  \"lng\": -45.96,\n  \"collections\": [\"S2_L2A\"],\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-10-06\",\n  \"maxCloud\": 10\n}"
-            },
+            "method": "GET",
+            "header": [],
             "url": {
-              "raw": "http://localhost:5000/api/search",
+              "raw": "http://localhost:5000/api/search?lat=-23.3&lng=-45.96&collections=S2_L2A,LANDSAT&maxCloud=10&startDate=2024-01-01&endDate=2024-10-06",
               "protocol": "http",
               "host": ["localhost"],
               "port": "5000",
-              "path": ["api", "search"]
+              "path": ["api", "search"],
+              "query": [
+                {"key": "lat", "value": "-23.3"},
+                {"key": "lng", "value": "-45.96"},
+                {"key": "collections", "value": "S2_L2A,LANDSAT"},
+                {"key": "maxCloud", "value": "10"},
+                {"key": "startDate", "value": "2024-01-01"},
+                {"key": "endDate", "value": "2024-10-06"}
+              ]
             },
-            "description": "🔍 Busca imagens com filtros avançados:\n- Coleções específicas\n- Máximo de cobertura de nuvens\n- Período personalizado"
-          },
-          "response": []
+            "description": "🔍 Busca com filtros: coleções específicas e cobertura de nuvens."
+          }
         }
-      ],
-      "description": "Endpoints da API STAC (catálogo de imagens)"
+      ]
     }
   ],
   "variable": [

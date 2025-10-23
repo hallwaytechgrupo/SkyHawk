@@ -4,7 +4,16 @@
 
 import axios from 'axios';
 import { config } from '../config';
-import { Collection, SearchResult } from '../types';
+import { 
+  Collection, 
+  SearchResult, 
+  StacCatalog, 
+  StacCollection, 
+  StacItem, 
+  CollectionCard, 
+  ItemCard, 
+  DownloadOption 
+} from '../types';
 
 const STAC_BASE_URL = config.stac.baseUrl;
 
@@ -108,4 +117,175 @@ export async function searchItemsByPoint(
     console.error('Erro ao buscar itens STAC:', error);
     return { features: [] };
   }
+}
+
+// ===== NOVAS FUNÇÕES PARA O FLUXO STAC DO INPE =====
+
+/**
+ * Obtém o catálogo principal STAC
+ */
+export async function getCatalog(): Promise<StacCatalog> {
+  try {
+    const response = await axios.get(`${STAC_BASE_URL}/`);
+    return response.data;
+  } catch (error) {
+    console.error('Erro ao buscar catálogo STAC:', error);
+    throw new Error('Erro ao acessar catálogo STAC');
+  }
+}
+
+/**
+ * Lista todas as coleções disponíveis (versão completa)
+ */
+export async function getStacCollections(): Promise<StacCollection[]> {
+  try {
+    const response = await axios.get(`${STAC_BASE_URL}/collections`);
+    return response.data.collections || [];
+  } catch (error) {
+    console.error('Erro ao buscar coleções STAC:', error);
+    return [];
+  }
+}
+
+/**
+ * Obtém detalhes de uma coleção específica
+ */
+export async function getStacCollection(collectionId: string): Promise<StacCollection> {
+  try {
+    const response = await axios.get(`${STAC_BASE_URL}/collections/${collectionId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Erro ao buscar coleção ${collectionId}:`, error);
+    throw new Error(`Coleção ${collectionId} não encontrada`);
+  }
+}
+
+/**
+ * Lista itens de uma coleção
+ */
+export async function getCollectionItems(
+  collectionId: string, 
+  limit: number = 50,
+  bbox?: number[]
+): Promise<StacItem[]> {
+  try {
+    const params: any = { limit };
+    if (bbox) {
+      params.bbox = bbox.join(',');
+    }
+
+    const response = await axios.get(`${STAC_BASE_URL}/collections/${collectionId}/items`, {
+      params
+    });
+    return response.data.features || [];
+  } catch (error) {
+    console.error(`Erro ao buscar itens da coleção ${collectionId}:`, error);
+    return [];
+  }
+}
+
+/**
+ * Transforma coleções em cards para o frontend
+ */
+export async function getCollectionCards(): Promise<CollectionCard[]> {
+  const collections = await getStacCollections();
+  
+  return collections.map(collection => {
+    // Extrai informações da extent
+    const spatialExtent = collection.extent?.spatial?.bbox?.[0] || [];
+    const temporalExtent = collection.extent?.temporal?.interval?.[0] || [];
+    
+    // Determina opções de download baseado no tipo de coleção
+    const downloadOptions: DownloadOption[] = [
+      {
+        type: 'tiff',
+        label: 'Imagens GeoTIFF',
+        url: `${STAC_BASE_URL}/collections/${collection.id}/items`,
+        format: 'GeoTIFF'
+      },
+      {
+        type: 'metadata',
+        label: 'Metadados JSON',
+        url: `${STAC_BASE_URL}/collections/${collection.id}`,
+        format: 'JSON'
+      }
+    ];
+
+    return {
+      id: collection.id,
+      title: collection.title,
+      description: collection.description,
+      extent: {
+        spatial: spatialExtent.length > 0 ? 
+          `${spatialExtent[0]?.toFixed(2)}, ${spatialExtent[1]?.toFixed(2)} - ${spatialExtent[2]?.toFixed(2)}, ${spatialExtent[3]?.toFixed(2)}` : 
+          'Global',
+        temporal: temporalExtent.length > 0 ? 
+          `${temporalExtent[0]} - ${temporalExtent[1] || 'presente'}` : 
+          'Indefinido'
+      },
+      downloadOptions
+    };
+  });
+}
+
+/**
+ * Transforma itens de coleção em cards para o frontend
+ */
+export async function getItemCards(
+  collectionId: string, 
+  limit: number = 20,
+  bbox?: number[]
+): Promise<ItemCard[]> {
+  const items = await getCollectionItems(collectionId, limit, bbox);
+  
+  return items.map(item => {
+    // Extrai opções de download dos assets
+    const dataAssets: DownloadOption[] = [];
+    const metadataAssets: DownloadOption[] = [];
+    let previewUrl: string | undefined;
+
+    Object.entries(item.assets).forEach(([key, asset]) => {
+      if (asset.roles?.includes('thumbnail') || key.toLowerCase().includes('thumbnail')) {
+        previewUrl = asset.href;
+      } else if (asset.href.endsWith('.tif') || asset.href.endsWith('.tiff')) {
+        dataAssets.push({
+          type: 'tiff',
+          label: asset.title || key,
+          url: asset.href,
+          format: 'GeoTIFF'
+        });
+      } else if (asset.href.endsWith('.json') || asset.type?.includes('json')) {
+        metadataAssets.push({
+          type: 'metadata',
+          label: asset.title || key,
+          url: asset.href,
+          format: 'JSON'
+        });
+      }
+    });
+
+    return {
+      id: item.id,
+      title: item.id,
+      date: item.properties.datetime || 'Data não disponível',
+      bbox: item.bbox,
+      thumbnail: previewUrl,
+      assets: {
+        preview: previewUrl,
+        data: dataAssets,
+        metadata: metadataAssets
+      }
+    };
+  });
+}
+
+/**
+ * Busca itens por área de interesse (bbox)
+ */
+export async function searchItemsByBbox(
+  collectionId: string,
+  bbox: number[],
+  limit: number = 50
+): Promise<ItemCard[]> {
+  return getItemCards(collectionId, limit, bbox);
 }
