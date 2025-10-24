@@ -331,3 +331,7 @@ Depois de testar a API:
 ---
 
 **Pronto para testar!** 🎉 Importe a collection e comece a explorar os dados de satélite!
+
+
+
+___
