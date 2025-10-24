@@ -1,6 +1,5 @@
 /**
  * SkyHawk - API de Monitoramento por Satélite
- * Backend para consulta de séries temporais de dados de satélite (STAC + WTSS)
  */
 
 import express from "express";
@@ -11,21 +10,69 @@ import routes from "./routes";
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:3000"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
-// Rotas
-app.use(routes);
+// Log
+app.use((req, res, next) => {
+  console.log(`📨 ${req.method} ${req.path}`);
+  next();
+});
 
-// Inicialização do servidor
-app.listen(config.port, () => {
-  console.log(`🚀 SkyHawk Backend rodando em http://localhost:${config.port}`);
-  console.log(`📡 Conectado às APIs INPE (STAC + WTSS)`);
-  console.log(`\n💡 Teste rápido:`);
-  console.log(`   POST http://localhost:${config.port}/api/time-series`);
-  console.log(
-    `   Body: { "lat": -23.3, "lng": -45.96, "startDate": "2024-01-01" }\n`
-  );
+// Rota raiz
+app.get("/", (req, res) => {
+  res.json({
+    message: "🛰️ SkyHawk API",
+    version: "1.0.0",
+    status: "online",
+    endpoints: {
+      health: "/api/health",
+      timeSeries: "/api/time-series",
+      satellites: "/api/satellites",
+    },
+  });
+});
+
+// Rotas com prefixo /api
+app.use("/api", routes);
+
+// Handler de erros
+app.use(
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error("❌ Erro:", err);
+    res.status(500).json({
+      error: err.message || "Erro interno",
+    });
+  }
+);
+
+// 404
+app.use((req, res) => {
+  res.status(404).json({
+    error: "Rota não encontrada",
+    path: req.path,
+  });
+});
+
+// ✅ INICIALIZAÇÃO (se não tiver server.ts)
+const PORT = config.port || 5000;
+
+app.listen(PORT, () => {
+  console.log(`\n🚀 SkyHawk rodando em http://localhost:${PORT}`);
+  console.log(`✅ Endpoints:`);
+  console.log(`   GET  http://localhost:${PORT}/`);
+  console.log(`   GET  http://localhost:${PORT}/api/health`);
+  console.log(`   POST http://localhost:${PORT}/api/time-series\n`);
 });
 
 export default app;

@@ -141,41 +141,55 @@ export class SkyHawkService {
     filters: FilterParams
   ): Promise<TimeSeriesData> {
     try {
-      // Primeiro, verificar se o backend está disponível
       const backendAvailable = await this.checkBackendHealth();
 
       if (!backendAvailable) {
         console.warn("⚠️  Backend não disponível. Usando dados simulados...");
-
-        // Simular delay de rede
         await new Promise((resolve) => setTimeout(resolve, 1000));
-
         return generateMockTimeSeriesData(lat, lng, filters);
       }
 
-      // Se o backend estiver disponível, fazer requisição real
-      const params = new URLSearchParams({
-        lat: lat.toString(),
-        lng: lng.toString(),
+      // ✅ CORRIGIR A URL - REMOVER "/satellite"
+      // ❌ ANTES: const endpoint = `${this.baseUrl}/satellite/time-series`;
+      // ✅ AGORA:
+      const endpoint = `${this.baseUrl}/time-series`;
+
+      const body = {
+        lat: lat,
+        lng: lng,
         satellite: filters.satellite,
         variable: filters.variable,
         startDate: filters.startDate,
         endDate: filters.endDate,
+      };
+
+      console.log(`🚀 Fazendo requisição POST para: ${endpoint}`);
+      console.log("📦 Payload:", JSON.stringify(body, null, 2));
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
       });
 
-      const endpoint = `${this.baseUrl}/satellite/time-series`;
-      console.log(`🚀 Fazendo requisição para: ${endpoint}?${params}`);
-
-      const response = await fetch(`${endpoint}?${params}`);
+      console.log(`📡 Resposta: ${response.status} ${response.statusText}`);
 
       if (!response.ok) {
         let errorMessage = `Erro HTTP: ${response.status}`;
+        let errorDetails = null;
+
         try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
+          errorDetails = await response.json();
+          console.error("📛 Erro do backend:", errorDetails);
+          errorMessage =
+            errorDetails.error || errorDetails.message || errorMessage;
         } catch {
-          // Se não conseguir fazer parse do JSON de erro, usa a mensagem padrão
+          const textError = await response.text();
+          console.error("📛 Resposta do servidor:", textError);
         }
+
         throw new Error(errorMessage);
       }
 
@@ -184,8 +198,6 @@ export class SkyHawkService {
       return data;
     } catch (error) {
       console.error("❌ Erro no serviço SkyHawk:", error);
-
-      // Em caso de erro, usar dados mock como fallback
       console.warn("🔄 Usando dados simulados como fallback...");
       await new Promise((resolve) => setTimeout(resolve, 500));
       return generateMockTimeSeriesData(lat, lng, filters);

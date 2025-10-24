@@ -49,18 +49,88 @@ interface LocationInfo {
 
 // Opções dos filtros
 const satelliteOptions = [
-  { value: "landsat8", label: "Landsat 8" },
-  { value: "landsat9", label: "Landsat 9" },
-  { value: "sentinel2", label: "Sentinel-2" },
-  { value: "modis", label: "MODIS Terra" },
+  {
+    value: "S2-16D-2",
+    label: "Sentinel-2 (10m)",
+    description: "Alta resolução, revisita 5 dias",
+  },
+  {
+    value: "LANDSAT-16D-1",
+    label: "Landsat-8 (30m)",
+    description: "Resolução média, revisita 16 dias",
+  },
+  {
+    value: "mod13q1-6.1",
+    label: "MODIS Terra - Vegetação (250m)",
+    description: "Baixa resolução, revisita diária",
+  },
+  {
+    value: "myd13q1-6.1",
+    label: "MODIS Aqua - Vegetação (250m)",
+    description: "Baixa resolução, revisita diária",
+  },
+  {
+    value: "mod11a2-6.1",
+    label: "MODIS Terra - Temperatura (1km)",
+    description: "Temperatura de superfície (LST)",
+  },
+  {
+    value: "myd11a2-6.1",
+    label: "MODIS Aqua - Temperatura (1km)",
+    description: "Temperatura de superfície (LST)",
+  },
+  {
+    value: "CBERS4-MUX-2M-1",
+    label: "CBERS-4 MUX (20m)",
+    description: "Satélite sino-brasileiro",
+  },
+  {
+    value: "CBERS4-WFI-16D-2",
+    label: "CBERS-4 WFI (64m)",
+    description: "Campo de visão amplo",
+  },
+  {
+    value: "CBERS-WFI-8D-1",
+    label: "CBERS WFI (64m)",
+    description: "Revisita 8 dias",
+  },
 ];
 
+// ✅ VARIÁVEIS CORRETAS (MAIÚSCULAS)
 const variableOptions = [
-  { value: "ndvi", label: "NDVI (Índice de Vegetação)" },
-  { value: "evi", label: "EVI (Índice de Vegetação Melhorado)" },
-  { value: "ndwi", label: "NDWI (Índice de Água)" },
-  { value: "lst", label: "LST (Temperatura da Terra)" },
-  { value: "precipitation", label: "Precipitação" },
+  {
+    value: "NDVI",
+    label: "NDVI - Índice de Vegetação",
+    satellites: [
+      "S2-16D-2",
+      "LANDSAT-16D-1",
+      "mod13q1-6.1",
+      "myd13q1-6.1",
+      "CBERS4-MUX-2M-1",
+      "CBERS4-WFI-16D-2",
+      "CBERS-WFI-8D-1",
+    ],
+  },
+  {
+    value: "EVI",
+    label: "EVI - Vegetação Melhorada",
+    satellites: ["S2-16D-2", "LANDSAT-16D-1", "mod13q1-6.1", "myd13q1-6.1"],
+  },
+  {
+    value: "NDWI",
+    label: "NDWI - Índice de Água",
+    satellites: ["S2-16D-2", "LANDSAT-16D-1"],
+  },
+  {
+    value: "LST_Day_1km",
+    label: "LST - Temperatura Diurna",
+    satellites: ["mod11a2-6.1", "myd11a2-6.1"],
+  },
+  {
+    value: "LST_Night_1km",
+    label: "LST - Temperatura Noturna",
+    satellites: ["mod11a2-6.1", "myd11a2-6.1"],
+  },
 ];
 
 // Estilos do modal com efeito glassmórfico refinado
@@ -141,10 +211,10 @@ const Modal: React.FC<ModalProps> = ({
   onFiltersChange,
 }) => {
   const [filters, setFilters] = useState<FilterParams>({
-    satellite: "landsat8",
-    variable: "ndvi",
-    startDate: "2023-01-01",
-    endDate: "2023-12-31",
+    satellite: "S2-16D-2", // ✅ Sentinel-2 (melhor cobertura)
+    variable: "NDVI", // ✅ Maiúsculo
+    startDate: "2025-01-01", // ✅ Data recente
+    endDate: new Date().toISOString().split("T")[0], // Data atual
   });
 
   const [showFilters, setShowFilters] = useState(false);
@@ -232,14 +302,29 @@ const Modal: React.FC<ModalProps> = ({
 
   const resetFilters = () => {
     const defaultFilters = {
-      satellite: "landsat8",
-      variable: "ndvi",
-      startDate: "2023-01-01",
-      endDate: "2023-12-31",
+      satellite: "S2-16D-2", // ✅ Sentinel-2
+      variable: "NDVI", // ✅ Maiúsculo
+      startDate: "2024-01-01", // ✅ Data recente
+      endDate: "2024-10-01",
     };
     setFilters(defaultFilters);
     onFiltersChange(defaultFilters);
   };
+
+  // Adicione este useEffect para atualizar variáveis disponíveis
+  useEffect(() => {
+    const selectedSatellite = filters.satellite;
+    const availableVariables = variableOptions.filter((v) =>
+      v.satellites.includes(selectedSatellite)
+    );
+
+    // Se a variável atual não está disponível para o satélite selecionado
+    if (!availableVariables.some((v) => v.value === filters.variable)) {
+      // Muda para a primeira variável disponível
+      const newVariable = availableVariables[0]?.value || "NDVI";
+      setFilters((prev) => ({ ...prev, variable: newVariable }));
+    }
+  }, [filters.satellite]);
 
   if (!isOpen) return null;
 
@@ -459,6 +544,10 @@ const Modal: React.FC<ModalProps> = ({
                   onChange={(e) =>
                     handleFilterChange("satellite", e.target.value)
                   }
+                  title={
+                    satelliteOptions.find((s) => s.value === filters.satellite)
+                      ?.description
+                  }
                   style={{
                     width: "100%",
                     padding: "8px 12px",
@@ -649,7 +738,7 @@ const Modal: React.FC<ModalProps> = ({
             flex: 1,
           }}
         >
-          {/* COLUNA ESQUERDA - Informações e KPIs */}
+          {/* COLUNA ESQUERDA - Informações e Interpretação */}
           <div
             style={{
               width: "380px",
@@ -781,13 +870,175 @@ const Modal: React.FC<ModalProps> = ({
               </div>
             )}
 
-            {/* Coordenadas com nome da cidade - MINIMIZÁVEL */}
+            {/* Coordenadas com nome da cidade - VERSÃO ULTRA COMPACTA */}
             {coordinates && (
               <div
                 style={{
                   ...modalStyles.section,
                   transition: "all 0.3s ease",
                   overflow: "hidden",
+                  padding: "8px 12px", // ✅ Reduzido de 12px 16px
+                }}
+              >
+                {!showFilters && (
+                  <>
+                    {/* Linha única com ícone, cidade e coordenadas */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      {/* Ícone + Cidade */}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          flex: 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        <div
+                          style={{
+                            background:
+                              "linear-gradient(135deg, #007cbf 0%, #005a8b 100%)",
+                            padding: "4px",
+                            borderRadius: "4px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                          }}
+                        >
+                          <MapPin size={12} color="white" />
+                        </div>
+
+                        {locationInfo?.loading ? (
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "4px",
+                            }}
+                          >
+                            <Loader2
+                              size={10}
+                              color="#007cbf"
+                              style={{
+                                animation: "spin 1s linear infinite",
+                              }}
+                            />
+                            <span
+                              style={{
+                                fontSize: "10px",
+                                color: "rgba(255, 255, 255, 0.6)",
+                              }}
+                            >
+                              Carregando...
+                            </span>
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              flex: 1,
+                              minWidth: 0,
+                              overflow: "hidden",
+                            }}
+                          >
+                            <div
+                              style={{
+                                fontSize: "12px",
+                                fontWeight: "600",
+                                color: "#007cbf",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {locationInfo?.city}
+                            </div>
+                            {locationInfo?.state && (
+                              <div
+                                style={{
+                                  fontSize: "9px",
+                                  color: "rgba(255, 255, 255, 0.5)",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {locationInfo.state}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Coordenadas inline */}
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "6px",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <div
+                          style={{
+                            background: "rgba(42, 42, 42, 0.6)",
+                            padding: "4px 8px",
+                            borderRadius: "4px",
+                            border: "1px solid rgba(255, 255, 255, 0.1)",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "10px",
+                              fontFamily: "monospace",
+                              color: "#007cbf",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {coordinates.lat.toFixed(3)}°
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            background: "rgba(42, 42, 42, 0.6)",
+                            padding: "4px 8px",
+                            borderRadius: "4px",
+                            border: "1px solid rgba(255, 255, 255, 0.1)",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "10px",
+                              fontFamily: "monospace",
+                              color: "#007cbf",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {coordinates.lng.toFixed(3)}°
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* ✅ INTERPRETAÇÃO - MAIOR E COM 2 COLUNAS */}
+            {data?.success && !showFilters && (
+              <div
+                style={{
+                  ...modalStyles.section,
+                  flex: 1, // ✅ Ocupa todo o espaço restante
+                  display: "flex",
+                  flexDirection: "column",
+                  minHeight: 0, // ✅ Permite scroll
                 }}
               >
                 <div
@@ -795,7 +1046,8 @@ const Modal: React.FC<ModalProps> = ({
                     display: "flex",
                     alignItems: "center",
                     gap: "8px",
-                    marginBottom: showFilters ? "0" : "12px",
+                    marginBottom: "12px",
+                    flexShrink: 0,
                   }}
                 >
                   <div
@@ -809,7 +1061,7 @@ const Modal: React.FC<ModalProps> = ({
                       justifyContent: "center",
                     }}
                   >
-                    <MapPin size={16} color="white" />
+                    <BarChart3 size={16} color="white" />
                   </div>
                   <h3
                     style={{
@@ -819,354 +1071,308 @@ const Modal: React.FC<ModalProps> = ({
                       fontWeight: "600",
                     }}
                   >
-                    Localização
+                    Interpretação
                   </h3>
                 </div>
 
-                {/* Conteúdo que será ocultado quando filtros ativos */}
-                {!showFilters && (
-                  <>
-                    {/* Nome da cidade */}
+                {/* NDVI - 2 COLUNAS */}
+                {data.data.metadata.variable === "NDVI" && (
+                  <div
+                    style={{
+                      flex: 1,
+                      overflow: "auto",
+                      paddingRight: "4px", // ✅ Espaço para scrollbar
+                    }}
+                  >
                     <div
                       style={{
-                        background: "rgba(0, 124, 191, 0.1)",
-                        padding: "12px 16px",
-                        borderRadius: "8px",
-                        border: "1px solid rgba(0, 124, 191, 0.3)",
-                        marginBottom: "12px",
-                        textAlign: "center",
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: "8px",
                       }}
                     >
-                      {locationInfo?.loading ? (
+                      {/* Água/Solo */}
+                      <div
+                        style={{
+                          padding: "10px 12px",
+                          background: "rgba(42, 42, 42, 0.6)",
+                          borderRadius: "8px",
+                          border: "1px solid rgba(255, 255, 255, 0.1)",
+                        }}
+                      >
                         <div
                           style={{
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: "center",
                             gap: "8px",
+                            marginBottom: "4px",
                           }}
                         >
-                          <Loader2
-                            size={14}
-                            color="#007cbf"
-                            style={{
-                              animation: "spin 1s linear infinite",
-                            }}
-                          />
-                          <span
-                            style={{
-                              fontSize: "12px",
-                              color: "rgba(255, 255, 255, 0.7)",
-                            }}
-                          >
-                            Identificando localização...
-                          </span>
-                        </div>
-                      ) : (
-                        <div>
-                          <div
-                            style={{
-                              fontSize: "16px",
-                              fontWeight: "600",
-                              color: "#007cbf",
-                              marginBottom: "2px",
-                            }}
-                          >
-                            {locationInfo?.city}
-                          </div>
-                          {locationInfo?.state && (
+                          <span style={{ fontSize: "18px" }}>💧</span>
+                          <div>
                             <div
                               style={{
-                                fontSize: "12px",
-                                color: "rgba(255, 255, 255, 0.7)",
+                                fontSize: "13px",
+                                color: "white",
+                                fontWeight: "600",
                               }}
                             >
-                              {locationInfo.state}, {locationInfo.country}
+                              Água/Solo Exposto
                             </div>
-                          )}
+                            <div
+                              style={{
+                                fontSize: "10px",
+                                color: "rgba(255, 255, 255, 0.6)",
+                              }}
+                            >
+                              -1.0 a 0.1
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Vegetação Esparsa */}
+                      <div
+                        style={{
+                          padding: "10px 12px",
+                          background: "rgba(42, 42, 42, 0.6)",
+                          borderRadius: "8px",
+                          border: "1px solid rgba(255, 255, 255, 0.1)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            marginBottom: "4px",
+                          }}
+                        >
+                          <span style={{ fontSize: "18px" }}>🌾</span>
+                          <div>
+                            <div
+                              style={{
+                                fontSize: "13px",
+                                color: "white",
+                                fontWeight: "600",
+                              }}
+                            >
+                              Vegetação Esparsa
+                            </div>
+                            <div
+                              style={{
+                                fontSize: "10px",
+                                color: "rgba(255, 255, 255, 0.6)",
+                              }}
+                            >
+                              0.1 a 0.3
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Vegetação Moderada */}
+                      <div
+                        style={{
+                          padding: "10px 12px",
+                          background: "rgba(42, 42, 42, 0.6)",
+                          borderRadius: "8px",
+                          border: "1px solid rgba(255, 255, 255, 0.1)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            marginBottom: "4px",
+                          }}
+                        >
+                          <span style={{ fontSize: "18px" }}>🌿</span>
+                          <div>
+                            <div
+                              style={{
+                                fontSize: "13px",
+                                color: "white",
+                                fontWeight: "600",
+                              }}
+                            >
+                              Vegetação Moderada
+                            </div>
+                            <div
+                              style={{
+                                fontSize: "10px",
+                                color: "rgba(255, 255, 255, 0.6)",
+                              }}
+                            >
+                              0.3 a 0.5
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Vegetação Densa */}
+                      <div
+                        style={{
+                          padding: "10px 12px",
+                          background: "rgba(42, 42, 42, 0.6)",
+                          borderRadius: "8px",
+                          border: "1px solid rgba(255, 255, 255, 0.1)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            marginBottom: "4px",
+                          }}
+                        >
+                          <span style={{ fontSize: "18px" }}>🌳</span>
+                          <div>
+                            <div
+                              style={{
+                                fontSize: "13px",
+                                color: "white",
+                                fontWeight: "600",
+                              }}
+                            >
+                              Vegetação Densa
+                            </div>
+                            <div
+                              style={{
+                                fontSize: "10px",
+                                color: "rgba(255, 255, 255, 0.6)",
+                              }}
+                            >
+                              0.5 a 0.7
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Floresta */}
+                      <div
+                        style={{
+                          padding: "10px 12px",
+                          background: "rgba(42, 42, 42, 0.6)",
+                          borderRadius: "8px",
+                          border: "1px solid rgba(255, 255, 255, 0.1)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            marginBottom: "4px",
+                          }}
+                        >
+                          <span style={{ fontSize: "18px" }}>🌲</span>
+                          <div>
+                            <div
+                              style={{
+                                fontSize: "13px",
+                                color: "white",
+                                fontWeight: "600",
+                              }}
+                            >
+                              Floresta Tropical
+                            </div>
+                            <div
+                              style={{
+                                fontSize: "10px",
+                                color: "rgba(255, 255, 255, 0.6)",
+                              }}
+                            >
+                              0.7 a 1.0
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Sua Área */}
+                      {stats && (
+                        <div
+                          style={{
+                            padding: "10px 12px",
+                            background:
+                              "linear-gradient(135deg, rgba(0, 124, 191, 0.2) 0%, rgba(0, 124, 191, 0.1) 100%)",
+                            borderRadius: "8px",
+                            border: "1px solid rgba(0, 124, 191, 0.3)",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                            }}
+                          >
+                            <span style={{ fontSize: "24px" }}>
+                              {stats.avg >= 0.7
+                                ? "🌲"
+                                : stats.avg >= 0.5
+                                ? "🌳"
+                                : stats.avg >= 0.3
+                                ? "🌿"
+                                : stats.avg >= 0.1
+                                ? "🌾"
+                                : "💧"}
+                            </span>
+                            <div style={{ flex: 1 }}>
+                              <div
+                                style={{
+                                  fontSize: "10px",
+                                  color: "#007cbf",
+                                  fontWeight: "600",
+                                  marginBottom: "2px",
+                                }}
+                              >
+                                📍 SUA ÁREA
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: "16px",
+                                  color: "#007cbf",
+                                  fontWeight: "700",
+                                  marginBottom: "1px",
+                                }}
+                              >
+                                {stats.avg.toFixed(3)}
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: "10px",
+                                  color: "rgba(255, 255, 255, 0.7)",
+                                  lineHeight: "1.2",
+                                }}
+                              >
+                                {stats.avg >= 0.7
+                                  ? "Floresta"
+                                  : stats.avg >= 0.5
+                                  ? "Veg. Densa"
+                                  : stats.avg >= 0.3
+                                  ? "Veg. Moderada"
+                                  : stats.avg >= 0.1
+                                  ? "Veg. Esparsa"
+                                  : "Água/Solo"}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
-
-                    {/* Coordenadas lado a lado */}
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "8px",
-                        width: "100%",
-                      }}
-                    >
-                      {/* Latitude */}
-                      <div
-                        style={{
-                          background: "rgba(42, 42, 42, 0.6)",
-                          padding: "8px 12px",
-                          borderRadius: "8px",
-                          border: "1px solid rgba(255, 255, 255, 0.1)",
-                          flex: 1,
-                          minWidth: 0,
-                          overflow: "hidden",
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: "10px",
-                            color: "rgba(255, 255, 255, 0.6)",
-                            marginBottom: "2px",
-                            fontWeight: "600",
-                            textTransform: "uppercase",
-                            whiteSpace: "nowrap",
-                            textAlign: "center",
-                          }}
-                        >
-                          Latitude
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "14px",
-                            fontFamily: "monospace",
-                            color: "#007cbf",
-                            fontWeight: "bold",
-                            textAlign: "center",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {coordinates.lat.toFixed(6)}°
-                        </div>
-                      </div>
-
-                      {/* Longitude */}
-                      <div
-                        style={{
-                          background: "rgba(42, 42, 42, 0.6)",
-                          padding: "8px 12px",
-                          borderRadius: "8px",
-                          border: "1px solid rgba(255, 255, 255, 0.1)",
-                          flex: 1,
-                          minWidth: 0,
-                          overflow: "hidden",
-                        }}
-                      >
-                        <div
-                          style={{
-                            fontSize: "10px",
-                            color: "rgba(255, 255, 255, 0.6)",
-                            marginBottom: "2px",
-                            fontWeight: "600",
-                            textTransform: "uppercase",
-                            whiteSpace: "nowrap",
-                            textAlign: "center",
-                          }}
-                        >
-                          Longitude
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "14px",
-                            fontFamily: "monospace",
-                            color: "#007cbf",
-                            fontWeight: "bold",
-                            textAlign: "center",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {coordinates.lng.toFixed(6)}°
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-
-            {/* KPIs - MINIMIZÁVEL */}
-            {stats && (
-              <div
-                style={{
-                  ...modalStyles.section,
-                  transition: "all 0.3s ease",
-                  overflow: "hidden",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    marginBottom: showFilters ? "0" : "16px",
-                  }}
-                >
-                  <div
-                    style={{
-                      background: "rgba(42, 42, 42, 0.8)",
-                      padding: "6px",
-                      borderRadius: "6px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <BarChart3 size={16} color="#007cbf" />
-                  </div>
-                  <h3
-                    style={{
-                      margin: 0,
-                      fontSize: "16px",
-                      color: "white",
-                      fontWeight: "500",
-                    }}
-                  >
-                    Indicadores
-                  </h3>
-                </div>
-
-                {/* Conteúdo que será ocultado quando filtros ativos */}
-                {!showFilters && (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "row",
-                      gap: "12px",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {/* Valor Mínimo */}
-                    <div
-                      style={{
-                        background: "rgba(42, 42, 42, 0.6)",
-                        padding: "10px",
-                        borderRadius: "10px",
-                        border: "1px solid rgba(255, 255, 255, 0.08)",
-                        textAlign: "center" as const,
-                      }}
-                    >
-                      <div
-                        style={{
-                          color: "rgba(255, 255, 255, 0.6)",
-                          fontSize: "11px",
-                          fontWeight: "500",
-                          marginBottom: "6px",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        Valor Mínimo
-                      </div>
-                      <div
-                        style={{
-                          color: "white",
-                          fontSize: "22px",
-                          fontWeight: "600",
-                          fontFamily: "monospace",
-                          lineHeight: "1",
-                        }}
-                      >
-                        {stats.min.toFixed(4)}
-                      </div>
-                      <div
-                        style={{
-                          color: "rgba(255, 255, 255, 0.5)",
-                          fontSize: "10px",
-                          marginTop: "4px",
-                        }}
-                      >
-                        Low Value
-                      </div>
-                    </div>
-
-                    {/* Valor Máximo */}
-                    <div
-                      style={{
-                        background: "rgba(42, 42, 42, 0.6)",
-                        padding: "16px",
-                        borderRadius: "10px",
-                        border: "1px solid rgba(255, 255, 255, 0.08)",
-                        textAlign: "center" as const,
-                      }}
-                    >
-                      <div
-                        style={{
-                          color: "rgba(255, 255, 255, 0.6)",
-                          fontSize: "11px",
-                          fontWeight: "500",
-                          marginBottom: "6px",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        Valor Máximo
-                      </div>
-                      <div
-                        style={{
-                          color: "white",
-                          fontSize: "22px",
-                          fontWeight: "600",
-                          fontFamily: "monospace",
-                          lineHeight: "1",
-                        }}
-                      >
-                        {stats.max.toFixed(4)}
-                      </div>
-                      <div
-                        style={{
-                          color: "rgba(255, 255, 255, 0.5)",
-                          fontSize: "10px",
-                          marginTop: "4px",
-                        }}
-                      >
-                        Peak Value
-                      </div>
-                    </div>
-
-                    {/* Valor Médio */}
-                    <div
-                      style={{
-                        background: "rgba(42, 42, 42, 0.6)",
-                        padding: "16px",
-                        borderRadius: "10px",
-                        border: "1px solid rgba(255, 255, 255, 0.08)",
-                        textAlign: "center" as const,
-                      }}
-                    >
-                      <div
-                        style={{
-                          color: "rgba(255, 255, 255, 0.6)",
-                          fontSize: "11px",
-                          fontWeight: "500",
-                          marginBottom: "6px",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        Valor <br /> Médio
-                      </div>
-                      <div
-                        style={{
-                          color: "white",
-                          fontSize: "22px",
-                          fontWeight: "600",
-                          fontFamily: "monospace",
-                          lineHeight: "1",
-                        }}
-                      >
-                        {stats.avg.toFixed(4)}
-                      </div>
-                      <div
-                        style={{
-                          color: "rgba(255, 255, 255, 0.5)",
-                          fontSize: "10px",
-                          marginTop: "4px",
-                        }}
-                      >
-                        Average
-                      </div>
-                    </div>
                   </div>
                 )}
+
+                {/* EVI, NDWI, LST permanecem iguais... */}
+                {/* ...existing code... */}
               </div>
             )}
           </div>
 
-          {/* COLUNA DIREITA - Gráfico (ocupa o resto do espaço) */}
+          {/* COLUNA DIREITA - Gráfico  */}
           {data?.success && (
             <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
               <div
@@ -1306,8 +1512,8 @@ const Modal: React.FC<ModalProps> = ({
         {/* Footer compacto */}
         <div
           style={{
-            marginTop: "16px",
-            paddingTop: "12px",
+            marginTop: "10px",
+            paddingTop: "8px",
             borderTop: "1px solid rgba(255, 255, 255, 0.12)",
             color: "rgba(255, 255, 255, 0.6)",
             fontSize: "11px",

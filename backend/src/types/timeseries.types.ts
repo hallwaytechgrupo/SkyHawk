@@ -4,7 +4,7 @@
 
 export interface TimeSeries {
   timeline: string[];
-  values: number[];
+  values: (number | null)[];
   metadata: {
     collection: string;
     variable: string;
