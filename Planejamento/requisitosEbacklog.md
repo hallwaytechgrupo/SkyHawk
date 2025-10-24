@@ -113,6 +113,7 @@
 | DW-0003    | Reposicionamento de componentes do front, de acordo com avaliação do cliente              | Dados comparáveis disponíveis                                                       | Gráficos exibindo corretamente as séries selecionadas                              |
 | DW-0004    | Validação da visualização de séries temporais em gráficos              | Dados comparáveis disponíveis                                                       | Gráficos exibindo corretamente as séries selecionadas                              |
 | DW-0005    | Implementação de filtros e painel de controle                         | Filtros definidos e interface preparada                                             | Painel funcional com filtros aplicáveis e responsivos                              |
+| DW-0006    | implementação dos cards demonstrativo STAC                         | Services e rotas definidos no backend                                             | cards sendo corretamente exibidos no modal de resultados e pesquisa                              |
 
 ---
 
@@ -127,6 +128,6 @@
 | TC-0005    | Exportação de dados e metadados em formatos compatíveis               | Dados disponíveis e estrutura de exportação definida                                | Exportação funcional em formatos como CSV ou JSON                                  |
 | BDN-0004   | Estratégia de cache para otimizar performance                         | Dados acessados com frequência identificados                                        | Cache implementado e validado com melhoria de tempo de resposta                    |
 | BDN-0005   | Garantia de integridade e atualização dos dados                       | Estrutura de dados e fontes definidas                                               | Validação automática de dados e atualização periódica implementada                 |
-| DW-0006    | Otimização de carregamento e responsividade                           | Interface final pronta                                                              | Sistema leve, rápido e responsivo em diferentes dispositivos                       |
+| DW-0007    | Otimização de carregamento e responsividade                           | Interface final pronta                                                              | Sistema leve, rápido e responsivo em diferentes dispositivos                       |
 
 ---
