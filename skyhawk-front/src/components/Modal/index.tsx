@@ -281,14 +281,14 @@ const Modal: React.FC<ModalProps> = ({
                 data1={
                   Object.fromEntries(
                     Object.entries(comparisonData1).filter(
-                      ([_, v]) => v !== null
+                      ([, v]) => v !== null
                     )
                   ) as Record<string, TimeSeriesData>
                 }
                 data2={
                   Object.fromEntries(
                     Object.entries(comparisonData2).filter(
-                      ([_, v]) => v !== null
+                      ([, v]) => v !== null
                     )
                   ) as Record<string, TimeSeriesData>
                 }
