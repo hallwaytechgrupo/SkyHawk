@@ -13,9 +13,10 @@ import { UnavailablePanel } from "./UnavailablePanel";
 import { ChartGrid } from "./ChartGrid";
 import { ComparisonGrid } from "./ComparisonGrid";
 import { useModalData } from "./hooks/useModalData";
-import { useComparisonData } from "./hooks/useComparisonData"; // ✅ NOVO
+import { useComparisonData } from "./hooks/useComparisonData";
 import type { ModalProps, FilterParams } from "./types";
 import type { TimeSeriesData } from "../../services/skyHawkService";
+import { InterpretationPanel } from "./InterpretationPanel"; // ✅ ADICIONAR
 
 const Modal: React.FC<ModalProps> = ({
   isOpen,
@@ -26,8 +27,6 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   const [filters, setFilters] = useState<FilterParams>(DEFAULT_FILTERS);
   const [showFilters, setShowFilters] = useState(false);
-
-  // ✅ Estados para comparação
   const [comparisonMode, setComparisonMode] = useState(false);
   const [satellite2, setSatellite2] = useState("LANDSAT-16D-1");
 
@@ -41,7 +40,7 @@ const Modal: React.FC<ModalProps> = ({
       onFiltersChange
     );
 
-  // ✅ NOVO: Hook para modo comparação
+  // Hook para modo comparação
   const {
     data1: comparisonData1,
     data2: comparisonData2,
@@ -181,7 +180,14 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div style={modalStyles.overlay} onClick={onClose}>
-      <div style={modalStyles.container} onClick={(e) => e.stopPropagation()}>
+      <div
+        style={{
+          ...modalStyles.container,
+          overflow: "visible",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
         <ModalHeader
           satellite={
             comparisonMode
@@ -199,20 +205,23 @@ const Modal: React.FC<ModalProps> = ({
           onClose={onClose}
         />
 
+        {/* FilterPanel */}
         {showFilters && (
-          <FilterPanel
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onApply={applyFilters}
-            onReset={resetFilters}
-            comparisonMode={comparisonMode}
-            onToggleComparison={handleComparisonToggle}
-            satellite2={satellite2}
-            onSatellite2Change={handleSatellite2Change}
-          />
+          <div style={{ position: "relative", zIndex: 10 }}>
+            <FilterPanel
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onApply={applyFilters}
+              onReset={resetFilters}
+              comparisonMode={comparisonMode}
+              onToggleComparison={handleComparisonToggle}
+              satellite2={satellite2}
+              onSatellite2Change={handleSatellite2Change}
+            />
+          </div>
         )}
 
-        {/* CONTEÚDO PRINCIPAL */}
+        {/* Conteúdo Principal */}
         <div
           style={{
             display: "flex",
@@ -222,8 +231,9 @@ const Modal: React.FC<ModalProps> = ({
             flex: 1,
           }}
         >
-          {/* COLUNA ESQUERDA */}
+          {/* ✅ COLUNA ESQUERDA COM SCROLL */}
           <div
+            className="custom-scrollbar" // ✅ Classe para scrollbar customizada
             style={{
               width: "280px",
               height: "100%",
@@ -231,8 +241,16 @@ const Modal: React.FC<ModalProps> = ({
               flexDirection: "column",
               gap: "16px",
               flexShrink: 0,
+              overflowY: "auto", // ✅ SCROLL VERTICAL ATIVO
+              overflowX: "hidden",
+              paddingRight: "8px",
+              // ✅ Scrollbar inline (caso CSS global não funcione)
+              scrollbarWidth: "thin",
+              scrollbarColor:
+                "rgba(0, 124, 191, 0.5) rgba(255, 255, 255, 0.05)",
             }}
           >
+            {/* Localização */}
             {coordinates && (
               <LocationPanel
                 coordinates={coordinates}
@@ -240,6 +258,10 @@ const Modal: React.FC<ModalProps> = ({
               />
             )}
 
+            {/* ✅ INTERPRETAÇÃO - Sem altura fixa */}
+            <InterpretationPanel />
+
+            {/* Loading */}
             <LoadingPanel
               loadingVariables={
                 comparisonMode
@@ -248,12 +270,13 @@ const Modal: React.FC<ModalProps> = ({
               }
             />
 
+            {/* Indisponíveis */}
             {!comparisonMode && loadingVariables.size === 0 && (
               <UnavailablePanel unavailableVariables={unavailableVariables} />
             )}
           </div>
 
-          {/* COLUNA DIREITA - Grid */}
+          {/* COLUNA DIREITA - Gráficos */}
           <div
             style={{
               flex: 1,

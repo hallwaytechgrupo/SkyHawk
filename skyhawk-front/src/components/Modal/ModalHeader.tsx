@@ -25,7 +25,7 @@ export const ModalHeader: React.FC<ModalHeaderProps> = ({
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: "24px",
+        marginBottom: "16px",
         borderBottom: "1px solid rgba(255, 255, 255, 0.12)",
         paddingBottom: "16px",
         flexShrink: 0,
@@ -49,7 +49,7 @@ export const ModalHeader: React.FC<ModalHeaderProps> = ({
           <h2
             style={{
               margin: 0,
-              fontSize: "24px",
+              fontSize: "18px",
               background: "linear-gradient(135deg, #007cbf 0%, #00a8ff 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
@@ -62,7 +62,7 @@ export const ModalHeader: React.FC<ModalHeaderProps> = ({
           <p
             style={{
               margin: "4px 0 0 0",
-              fontSize: "13px",
+              fontSize: "12px",
               color: "rgba(255, 255, 255, 0.7)",
               fontWeight: "500",
             }}

@@ -83,6 +83,7 @@ const Onboarding: React.FC = () => {
   if (!visible) return null;
 
   const step = steps[index];
+  const isLastStep = index === steps.length - 1; // ✅ Verificar se é último passo
 
   return (
     <div style={overlayStyles} role="dialog" aria-modal="true">
@@ -178,6 +179,7 @@ const Onboarding: React.FC = () => {
                 alignItems: "center",
               }}
             >
+              {/* Botão Anterior */}
               <button
                 onClick={() => setIndex(Math.max(0, index - 1))}
                 disabled={index === 0}
@@ -192,28 +194,42 @@ const Onboarding: React.FC = () => {
               >
                 Anterior
               </button>
-              <button
-                onClick={() => setIndex(Math.min(steps.length - 1, index + 1))}
-                disabled={index === steps.length - 1}
-                style={footerButton}
-              >
-                Próximo
-              </button>
-              <div style={{ marginLeft: "auto" }}>
+
+              {/* ✅ BOTÃO CONDICIONAL: Próximo OU Concluir */}
+              {!isLastStep ? (
+                // Mostrar "Próximo" até o passo 3
                 <button
-                  onClick={close}
-                  style={{
-                    padding: "8px 12px",
-                    borderRadius: 8,
-                    border: "1px solid rgba(255,255,255,0.06)",
-                    background: "transparent",
-                    color: "white",
-                    cursor: "pointer",
-                  }}
+                  onClick={() => setIndex(index + 1)}
+                  style={footerButton}
                 >
+                  Próximo
+                </button>
+              ) : (
+                // Mostrar "Concluir" no passo 4
+                <button onClick={close} style={footerButton}>
                   Concluir
                 </button>
-              </div>
+              )}
+
+              {/* ✅ Botão Pular (opcional, só aparece até passo 3) */}
+              {!isLastStep && (
+                <div style={{ marginLeft: "auto" }}>
+                  <button
+                    onClick={close}
+                    style={{
+                      padding: "8px 12px",
+                      borderRadius: 8,
+                      border: "1px solid rgba(255,255,255,0.06)",
+                      background: "transparent",
+                      color: "rgba(255,255,255,0.7)",
+                      cursor: "pointer",
+                      fontSize: 13,
+                    }}
+                  >
+                    Pular
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

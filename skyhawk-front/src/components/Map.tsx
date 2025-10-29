@@ -5,6 +5,7 @@ import {
   skyHawkService,
   type TimeSeriesData,
 } from "../services/skyHawkService";
+import Onboarding from "./Onboarding";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYm9pdGF0YSIsImEiOiJjbTlrZGF3ejgwb2FxMnJvYWZ1Z3pudndpIn0.EiV7WmRDDZZBkY2A0PSJ1A";
@@ -210,6 +211,7 @@ const MapComponent = () => {
           </div>
         </div>
       )}
+      <Onboarding />
 
       {/* Modal para exibir dados da série temporal */}
       <Modal

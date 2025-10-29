@@ -1,6 +1,6 @@
 import React from "react";
+import { AlertTriangle } from "lucide-react";
 import { modalStyles } from "./styles";
-import { variableLabels } from "./constants";
 
 interface UnavailablePanelProps {
   unavailableVariables: string[];
@@ -15,43 +15,65 @@ export const UnavailablePanel: React.FC<UnavailablePanelProps> = ({
     <div
       style={{
         ...modalStyles.section,
-        padding: "12px",
-        background:
-          "linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(26, 26, 26, 0.9) 100%)",
-        border: "1px solid rgba(255, 193, 7, 0.3)",
+        backgroundColor: "rgba(255, 152, 0, 0.1)",
+        border: "1px solid rgba(255, 152, 0, 0.3)",
+        // ✅ REDUZIR PADDING
+        padding: "10px 12px",
       }}
     >
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "8px",
-          marginBottom: "8px",
+          gap: "6px", // ✅ Reduzir gap
+          marginBottom: "8px", // ✅ Reduzir margem
         }}
       >
-        <span style={{ fontSize: "14px" }}>⚠️</span>
-        <span
+        <AlertTriangle size={14} color="#ff9800" /> {/* ✅ Ícone menor */}
+        <h3
           style={{
-            fontSize: "12px",
-            color: "#ffc107",
+            margin: 0,
+            fontSize: "11px", // ✅ Fonte menor
+            color: "#ff9800",
             fontWeight: "600",
           }}
         >
           Dados indisponíveis
-        </span>
+        </h3>
       </div>
-      {unavailableVariables.map((variable) => (
-        <div
-          key={variable}
-          style={{
-            fontSize: "11px",
-            color: "rgba(255, 255, 255, 0.6)",
-            padding: "4px 0",
-          }}
-        >
-          • {variableLabels[variable]}
-        </div>
-      ))}
+
+      <ul
+        style={{
+          margin: 0,
+          padding: "0 0 0 16px", // ✅ Reduzir padding
+          fontSize: "9px", // ✅ Fonte menor
+          color: "rgba(255, 255, 255, 0.7)",
+          listStyle: "none",
+        }}
+      >
+        {unavailableVariables.map((variable, index) => (
+          <li
+            key={index}
+            style={{
+              marginBottom: "4px", // ✅ Reduzir margem
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            <span
+              style={{
+                width: "4px", // ✅ Ponto menor
+                height: "4px",
+                backgroundColor: "#ff9800",
+                borderRadius: "50%",
+                flexShrink: 0,
+              }}
+            />
+            <span>{variable}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
