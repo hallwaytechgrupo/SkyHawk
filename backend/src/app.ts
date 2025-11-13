@@ -64,15 +64,4 @@ app.use((req, res) => {
   });
 });
 
-// ✅ INICIALIZAÇÃO (se não tiver server.ts)
-const PORT = config.port || 5000;
-
-app.listen(PORT, () => {
-  console.log(`\n🚀 SkyHawk rodando em http://localhost:${PORT}`);
-  console.log(`✅ Endpoints:`);
-  console.log(`   GET  http://localhost:${PORT}/`);
-  console.log(`   GET  http://localhost:${PORT}/api/health`);
-  console.log(`   POST http://localhost:${PORT}/api/time-series\n`);
-});
-
 export default app;

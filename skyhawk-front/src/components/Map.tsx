@@ -153,6 +153,34 @@ const MapComponent = () => {
     console.log("Todos os marcadores removidos");
   };
 
+  // Export handlers
+  const handleExport = async (format: 'csv' | 'json') => {
+    if (!modalData || !modalCoordinates) return;
+
+    try {
+      const sat =
+        modalData.data?.metadata?.collection || 'S2-16D-2';
+      const variable =
+        (modalData.data?.metadata?.variable || 'ndvi').toString().toLowerCase();
+      const start =
+        modalData.data?.metadata?.period?.start || '2023-01-01';
+      const end = modalData.data?.metadata?.period?.end || '2023-12-31';
+
+      await skyHawkService.exportData({
+        satellite: sat,
+        variable,
+        startDate: start,
+        endDate: end,
+        lat: modalCoordinates.lat,
+        lng: modalCoordinates.lng,
+        format,
+      });
+    } catch (err) {
+      console.error('Erro ao exportar:', err);
+      alert('Erro ao exportar. Veja o console para detalhes.');
+    }
+  };
+
   return (
     <>
       <div ref={mapContainer} style={{ width: "100%", height: "100%" }} />
@@ -181,6 +209,52 @@ const MapComponent = () => {
             }}
           >
             Limpar Marcadores ({markers.length})
+          </button>
+        </div>
+      )}
+
+      {/* Export buttons when modal is open with data */}
+      {modalData && modalCoordinates && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '140px',
+            left: '10px',
+            zIndex: 1000,
+            display: 'flex',
+            gap: '8px',
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => handleExport('csv')}
+            style={{
+              padding: '8px 12px',
+              backgroundColor: '#0d6efd',
+              color: 'white',
+              border: 'none',
+              borderRadius: '3px',
+              cursor: 'pointer',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+            }}
+          >
+            Exportar CSV
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleExport('json')}
+            style={{
+              padding: '8px 12px',
+              backgroundColor: '#198754',
+              color: 'white',
+              border: 'none',
+              borderRadius: '3px',
+              cursor: 'pointer',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+            }}
+          >
+            Exportar JSON
           </button>
         </div>
       )}

@@ -142,15 +142,11 @@ export async function compareTimeSeries(
  * Exporta dados em JSON ou CSV
  */
 export async function exportData(req: Request, res: Response): Promise<void> {
-  const {
-    type = "json",
-    collections,
-    variable,
-    startDate,
-    endDate,
-    lat,
-    lng,
-  } = req.query;
+  // Accept either `format` (preferred) or legacy `type`
+  const { format, type, collections, variable, startDate, endDate, lat, lng } =
+    req.query;
+
+  const outFormat = (format || type || "json") as string;
 
   if (!collections || !lat || !lng) {
     res
@@ -182,34 +178,79 @@ export async function exportData(req: Request, res: Response): Promise<void> {
       ),
     ]);
 
-    const exportData = {
+    const exportPayload = {
       point: { lat: numLat, lng: numLng },
       filters: {
         collections: parsedCollections,
-        variable: variable as string,
-        period: `${startDate}/${endDate}`,
+        variable: (variable as string) || config.defaults.variable,
+        period: `${startDate || ""}/${endDate || ""}`,
       },
       metadados: items.features,
       series,
       source: "INPE STAC/WTSS - Export",
     };
 
-    if (type === "json") {
-      res.json(exportData);
-    } else {
-      let csv = "Satellite,Date,Value\n";
-      series.forEach((s: any) =>
-        s.timeline.forEach(
-          (date: string, i: number) =>
-            (csv += `${s.metadata.collection},${date},${s.values[i]}\n`)
-        )
+    // JSON export
+    if (outFormat.toLowerCase() === "json") {
+      res.setHeader("Content-Type", "application/json");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="export.json"`
       );
-      res.header("Content-Type", "text/csv");
-      res.attachment("export.csv");
-      res.send(csv);
+      res.status(200).json(exportPayload);
+      return;
     }
-  } catch (error) {
-    console.error("Erro em exportData:", error);
+
+    // CSV export - stream the output
+    // Define CSV header schema
+    const csvHeader = [
+      "date",
+      "satellite",
+      "variable",
+      "value",
+      "latitude",
+      "longitude",
+      "source",
+    ];
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="export.csv"`
+    );
+
+    // Create a generator that yields CSV lines
+    async function* generateCsv() {
+      // Header
+      yield csvHeader.join(",") + "\n";
+
+      for (const s of series as any[]) {
+        const satellite = s.metadata?.collection || "";
+        const varName = s.metadata?.variable || (variable as string) || "";
+
+        for (let i = 0; i < s.timeline.length; i++) {
+          const date = s.timeline[i];
+          const value = s.values ? s.values[i] : "";
+          const row = [
+            date,
+            satellite,
+            varName,
+            value,
+            String(numLat),
+            String(numLng),
+            s.metadata?.source || "STAC/WTSS",
+          ];
+          // Escape commas/newlines if needed
+          yield row.map((v) => String(v)).join(",") + "\n";
+        }
+      }
+    }
+
+    const { Readable } = await import("stream");
+    const stream = Readable.from(generateCsv());
+    stream.pipe(res);
+  } catch (error: any) {
+    console.error("Erro em exportData:", error?.message || error);
     res.status(500).json({ error: "Erro ao exportar dados" });
   }
 }

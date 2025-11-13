@@ -4,9 +4,10 @@
   "description": "Base project TypeScript + Node + Express (minimal)",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/app.js"
+    "start": "node dist/server.js",
+    "test": "jest --runInBand"
   },
   "keywords": [],
   "author": "",
@@ -14,7 +15,12 @@
   "devDependencies": {
     "@types/axios": "^0.9.36",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "supertest": "^6.3.3",
+    "@types/supertest": "^2.0.12"
   },
   "dependencies": {
     "@turf/turf": "^7.2.0",

@@ -276,6 +276,99 @@ export class SkyHawkService {
       ];
     }
   }
+
+  async exportData(params: {
+    satellite: string;
+    variable: string;
+    startDate: string;
+    endDate: string;
+    lat: number;
+    lng: number;
+    format: 'csv' | 'json';
+  }): Promise<void> {
+    const { satellite, variable, startDate, endDate, lat, lng, format } =
+      params;
+
+    const qs = new URLSearchParams({
+      format,
+      collections: satellite,
+      variable,
+      startDate,
+      endDate,
+      lat: String(lat),
+      lng: String(lng),
+    });
+
+    // Ensure we use an absolute URL. Normalize baseUrl when necessary.
+    const normalize = (b: string) => {
+      if (!b) return '';
+      // already absolute
+      if (b.startsWith('http://') || b.startsWith('https://')) return b.replace(/\/+$/, '');
+      // starts with port like :5000 or :5000/api
+      if (b.startsWith(':')) {
+        return `${window.location.protocol}//${window.location.hostname}${b}`.replace(/\/+$/, '');
+      }
+      // starts with / (absolute path)
+      if (b.startsWith('/')) return `${window.location.origin}${b}`.replace(/\/+$/, '');
+      // otherwise relative - prepend origin
+      return `${window.location.origin}/${b}`.replace(/\/+$/, '');
+    };
+
+    const base = normalize(this.baseUrl);
+    const urlCandidates = [
+      `${base}/export?${qs.toString()}`,
+      // fallback: if base contains /api try without it
+      base.includes('/api') ? `${base.replace(/\/api$/, '')}/export?${qs.toString()}` : null,
+      // fallback: try absolute path on current origin
+      `${window.location.origin}/api/export?${qs.toString()}`,
+      `${window.location.origin}/export?${qs.toString()}`,
+    ].filter(Boolean) as string[];
+
+    let lastErr: any = null;
+    let response: Response | null = null;
+
+    for (const u of urlCandidates) {
+      try {
+        response = await fetch(u, { method: 'GET' });
+        // network-level failure will throw; non-OK stays to be handled below
+        if (response) {
+          // if 404 or other non-ok, still return response to inspect
+          break;
+        }
+      } catch (err) {
+        lastErr = err;
+        // try next candidate
+      }
+    }
+
+    if (!response) {
+      throw new Error(`Erro ao exportar: falha de rede (${lastErr?.message || 'unknown'})`);
+    }
+
+    if (!response.ok) {
+      const text = await response.text().catch(() => '');
+      throw new Error(`Erro ao exportar: ${response.status} - ${text}`);
+    }
+
+    const blob = await response.blob();
+
+    // Determine filename from Content-Disposition or fallback
+    let filename = format === 'csv' ? 'export.csv' : 'export.json';
+    const cd = response.headers.get('content-disposition');
+    if (cd) {
+      const match = /filename="?([^";]+)"?/.exec(cd);
+      if (match && match[1]) filename = match[1];
+    }
+
+    const href = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = href;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(href);
+  }
 }
 
 export const skyHawkService = new SkyHawkService();
