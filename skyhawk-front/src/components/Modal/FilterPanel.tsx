@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, cloneElement, isValidElement } from "react";
 import { Filter, Calendar, RefreshCw, GitCompare, Info } from "lucide-react";
 import { modalStyles } from "./styles";
 import { satelliteOptions } from "./constants";
@@ -15,12 +15,19 @@ interface FilterPanelProps {
   onSatellite2Change?: (satellite: string) => void;
 }
 
-// ✅ Componente de Tooltip
+// ✅ Componente de Tooltip (ATUALIZADO)
 const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({
   text,
   children,
 }) => {
   const [show, setShow] = useState(false);
+
+  // Clona o elemento filho (o botão) e adiciona o aria-label
+  const childWithAriaLabel = isValidElement(children)
+    ? cloneElement(children as React.ReactElement<{ "aria-label": string }>, {
+        "aria-label": text,
+      })
+    : children;
 
   return (
     <div
@@ -28,7 +35,7 @@ const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({
       onMouseEnter={() => setShow(true)}
       onMouseLeave={() => setShow(false)}
     >
-      {children}
+      {childWithAriaLabel}
       {show && (
         <div
           style={{
