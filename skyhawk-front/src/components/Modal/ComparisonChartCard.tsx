@@ -220,7 +220,8 @@ export const ComparisonChartCard: React.FC<ComparisonChartCardProps> = ({
                 strokeWidth={2}
                 dot={{ fill: "#9c27b0", r: 3 }}
                 activeDot={{ r: 5 }}
-                connectNulls={true} // ✅ CONECTAR LACUNAS
+                connectNulls={true}
+                isAnimationActive={false} // ✅ CONECTAR LACUNAS
               />
               <Line
                 type="monotone"

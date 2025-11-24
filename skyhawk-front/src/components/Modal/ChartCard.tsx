@@ -160,7 +160,8 @@ export const ChartCard: React.FC<ChartCardProps> = ({
                 strokeWidth={2}
                 dot={{ fill: variableColors[variable], r: 3 }}
                 activeDot={{ r: 5 }}
-                connectNulls={true} // ✅ CONECTAR LACUNAS
+                connectNulls={true}
+                isAnimationActive={false} // ✅ CONECTAR LACUNAS
               />
             </LineChart>
           </ResponsiveContainer>

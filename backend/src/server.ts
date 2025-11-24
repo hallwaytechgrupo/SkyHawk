@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
-import routes from "./routes";
+import compression from "compression"; // Importar
+import path from "path";
+import routes from "./routes"; // Importe suas rotas corretamente
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,7 +15,7 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(compression()); // ✅ Habilitar compressão para todas as rotas
 
 // ✅ LOGGER MIDDLEWARE
 app.use((req, res, next) => {
@@ -54,6 +56,21 @@ app.use((req, res) => {
       "GET /api/export",
     ],
   });
+});
+
+// Servir o frontend buildado
+const frontEndPath = path.join(__dirname, "..", "skyhawk-front", "dist");
+app.use(
+  express.static(frontEndPath, {
+    // ✅ Configurar cache para assets estáticos
+    maxAge: "1y", // Cache de 1 ano para arquivos com hash
+    etag: false, // ETag é menos necessário com versionamento de arquivo
+  })
+);
+
+// Fallback para o index.html para SPAs
+app.get("*", (req, res) => {
+  res.sendFile(path.join(frontEndPath, "index.html"));
 });
 
 // ✅ INICIAR SERVIDOR

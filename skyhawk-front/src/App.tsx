@@ -1,5 +1,30 @@
+import React, { Suspense, lazy } from "react";
 import "./App.css";
-import Map from "./components/Map";
+
+// Carrega o componente Map sob demanda (lazy loading)
+const Map = lazy(() => import("./components/Map"));
+
+// Componente de fallback para exibir durante o carregamento
+const LoadingFallback = () => (
+  <div
+    style={{
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "#1e1e1e",
+    }}
+  >
+    <div style={{ textAlign: "center", color: "white" }}>
+      <img
+        src="/skyhawklogo.png"
+        alt="Logo"
+        style={{ height: "80px", marginBottom: "20px" }}
+      />
+      <p>Carregando sistema de monitoramento...</p>
+    </div>
+  </div>
+);
 
 function App() {
   return (
@@ -34,7 +59,7 @@ function App() {
           }}
         >
           <img
-            src="/skyhawklogo.png"
+            src="/skyhawklogo.webp" // ✅ MUDANÇA: Usar imagem otimizada
             alt="Logo"
             style={{
               height: "48px",
@@ -193,7 +218,10 @@ function App() {
           overflow: "hidden",
         }}
       >
-        <Map />
+        {/* Suspense mostra o fallback enquanto o Map é carregado */}
+        <Suspense fallback={<LoadingFallback />}>
+          <Map />
+        </Suspense>
       </div>
     </div>
   );

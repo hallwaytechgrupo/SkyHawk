@@ -183,7 +183,7 @@ const Modal: React.FC<ModalProps> = ({
       <div
         style={{
           ...modalStyles.container,
-          overflow: "visible",
+          overflow: "visible", // ✅ Permitir overflow
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -227,13 +227,12 @@ const Modal: React.FC<ModalProps> = ({
             display: "flex",
             gap: "20px",
             height: "calc(100% - 140px)",
-            overflow: "hidden",
+            overflow: "hidden", // ✅ Container principal sem scroll
             flex: 1,
           }}
         >
-          {/* ✅ COLUNA ESQUERDA COM SCROLL */}
+          {/* ✅ COLUNA ESQUERDA - COM SCROLL */}
           <div
-            className="custom-scrollbar" // ✅ Classe para scrollbar customizada
             style={{
               width: "280px",
               height: "100%",
@@ -241,14 +240,15 @@ const Modal: React.FC<ModalProps> = ({
               flexDirection: "column",
               gap: "16px",
               flexShrink: 0,
-              overflowY: "auto", // ✅ SCROLL VERTICAL ATIVO
-              overflowX: "hidden",
+              overflowY: "auto", // ✅ SCROLL VERTICAL
+              overflowX: "hidden", // ✅ SEM SCROLL HORIZONTAL
               paddingRight: "8px",
-              // ✅ Scrollbar inline (caso CSS global não funcione)
+              // ✅ CUSTOMIZAR SCROLLBAR
               scrollbarWidth: "thin",
-              scrollbarColor:
-                "rgba(0, 124, 191, 0.5) rgba(255, 255, 255, 0.05)",
+              scrollbarColor: "rgba(0, 124, 191, 0.5) rgba(255, 255, 255, 0.1)",
             }}
+            // Customizar scrollbar webkit (Chrome, Safari, Edge)
+            className="custom-scrollbar"
           >
             {/* Localização */}
             {coordinates && (
@@ -258,7 +258,7 @@ const Modal: React.FC<ModalProps> = ({
               />
             )}
 
-            {/* ✅ INTERPRETAÇÃO - Sem altura fixa */}
+            {/* ✅ INTERPRETAÇÃO */}
             <InterpretationPanel />
 
             {/* Loading */}

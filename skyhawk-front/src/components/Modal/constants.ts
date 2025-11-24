@@ -60,20 +60,50 @@ export const satelliteVariables: { [key: string]: string[] } = {
   "CBERS-WFI-8D-1": ["NDVI"],
 };
 
-export const variableColors: { [key: string]: string } = {
-  NDVI: "#00a86b",
-  EVI: "#00c896",
-  NDWI: "#0077b6",
-  LST_Day_1km: "#ff6347",
-  LST_Night_1km: "#ff8c69",
+export const variableColors: Record<string, string> = {
+  // Índices
+  NDVI: "#4caf50",
+  EVI: "#00bcd4",
+
+  // Sentinel-2 Bands
+  BAND5: "#2196f3", // Blue
+  BAND6: "#4caf50", // Green
+  BAND7: "#f44336", // Red
+  BAND8: "#9c27b0", // NIR
+
+  // Landsat Bands
+  BAND2: "#2196f3", // Blue
+  BAND3: "#4caf50", // Green
+  BAND4: "#f44336", // Red
+
+  // MODIS Bands
+  blue: "#2196f3",
+  red: "#f44336",
+  nir: "#9c27b0",
+  mir: "#ff9800",
 };
 
-export const variableLabels: { [key: string]: string } = {
-  NDVI: "NDVI - Índice de Vegetação",
-  EVI: "EVI - Vegetação Melhorada",
-  NDWI: "NDWI - Índice de Água",
-  LST_Day_1km: "LST - Temperatura Diurna",
-  LST_Night_1km: "LST - Temperatura Noturna",
+export const variableLabels: Record<string, string> = {
+  // Índices
+  NDVI: "NDVI",
+  EVI: "EVI",
+
+  // Sentinel-2
+  BAND5: "Azul (B5)",
+  BAND6: "Verde (B6)",
+  BAND7: "Vermelho (B7)",
+  BAND8: "NIR (B8)",
+
+  // Landsat
+  BAND2: "Azul (B2)",
+  BAND3: "Verde (B3)",
+  BAND4: "Vermelho (B4)",
+
+  // MODIS
+  blue: "Azul",
+  red: "Vermelho",
+  nir: "NIR",
+  mir: "MIR",
 };
 
 export const DEFAULT_FILTERS = {
